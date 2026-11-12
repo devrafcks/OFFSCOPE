@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360">
+	<defs>
+		<linearGradient id="p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#151827"/><stop offset="0.6" stop-color="#6B4252"/><stop offset="0.9" stop-color="#F0A77A"/></linearGradient>
+		<linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0.45" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.85"/></linearGradient>
+	</defs>
+	<rect width="640" height="360" fill="url(#p)"/>
+	
+	<g fill="none" stroke="#2C1F29" stroke-width="4.25">
+		<line x1="380" y1="270" x2="380" y2="100"/>
+		<line x1="434.4" y1="270" x2="434.4" y2="100"/>
+		<line x1="380" y1="193.5" x2="434.4" y2="193.5"/>
+		<line x1="380" y1="270" x2="434.4" y2="193.5"/>
+		<line x1="434.4" y1="270" x2="380" y2="193.5"/>
+		<line x1="292.96" y1="100" x2="521.44" y2="100"/>
+		<line x1="407.2" y1="57.5" x2="292.96" y2="100"/>
+		<line x1="407.2" y1="57.5" x2="521.44" y2="100"/>
+	</g>
+	<rect x="369.12" y="88.1" width="76.16" height="13.6" fill="#2C1F29"/><rect x="0" y="244" width="79.48922520503402" height="25" fill="#2D2129"/><rect x="0" y="218" width="79.48922520503402" height="25" fill="#2D2129"/><rect x="81.48922520503402" y="244" width="101.15663981996477" height="25" fill="#2D2129"/><rect x="81.48922520503402" y="218" width="101.15663981996477" height="25" fill="#2D2129"/><rect x="184.64586502499878" y="244" width="95.47348108142614" height="25" fill="#2D2129"/><rect x="184.64586502499878" y="218" width="95.47348108142614" height="25" fill="#2D2129"/><rect x="312.1193461064249" y="244" width="100.16572107560933" height="25" fill="#2D2129"/><rect x="414.28506718203425" y="244" width="91.7765069194138" height="25" fill="#2D2129"/><rect x="414.28506718203425" y="218" width="91.7765069194138" height="25" fill="#2D2129"/><rect x="414.28506718203425" y="192" width="91.7765069194138" height="25" fill="#2D2129"/><rect x="508.06157410144806" y="244" width="106.52145641855896" height="25" fill="#2D2129"/><rect x="616.583030520007" y="244" width="81.1908458918333" height="25" fill="#2D2129"/><rect y="270" width="640" height="90" fill="#12121A"/>
+	<rect width="640" height="360" fill="url(#fade)"/>
+	<text x="28" y="300" font-family="Bahnschrift, 'Arial Black', sans-serif" font-weight="700" font-size="46" fill="#FFFFFF">CAIS 09</text>
+	<text x="30" y="334" font-family="'Segoe UI', Arial, sans-serif" font-size="19" fill="#FFB830">Porto industrial · amanhecer</text>
+	</svg>

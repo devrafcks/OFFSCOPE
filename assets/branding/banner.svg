@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
+	<defs>
+		<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#0E1220"/>
+			<stop offset="0.55" stop-color="#3B2A3A"/>
+			<stop offset="0.78" stop-color="#C9785A"/>
+			<stop offset="0.9" stop-color="#F2B572"/>
+		</linearGradient>
+		<radialGradient id="sun" cx="0.72" cy="0.78" r="0.35">
+			<stop offset="0" stop-color="#FFE3B0" stop-opacity="0.95"/>
+			<stop offset="0.12" stop-color="#FFC27A" stop-opacity="0.6"/>
+			<stop offset="1" stop-color="#FF9A50" stop-opacity="0"/>
+		</radialGradient>
+		<linearGradient id="fog" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#E8B39A" stop-opacity="0"/>
+			<stop offset="1" stop-color="#E8B39A" stop-opacity="0.55"/>
+		</linearGradient>
+		<linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#16171C"/>
+			<stop offset="1" stop-color="#07080A"/>
+		</linearGradient>
+		<linearGradient id="shade" x1="0" y1="0" x2="1" y2="0">
+			<stop offset="0" stop-color="#07080B" stop-opacity="0.92"/>
+			<stop offset="0.55" stop-color="#07080B" stop-opacity="0.35"/>
+			<stop offset="1" stop-color="#07080B" stop-opacity="0"/>
+		</linearGradient>
+	</defs>
+	<rect width="1280" height="640" fill="url(#sky)"/>
+	<rect width="1280" height="640" fill="url(#sun)"/>
+	<circle cx="921.5999999999999" cy="499.20000000000005" r="46" fill="#FFE6BC"/>
+	
+	<g fill="none" stroke="#2A1E26" stroke-width="5.75">
+		<line x1="820" y1="520" x2="820" y2="290"/>
+		<line x1="893.6" y1="520" x2="893.6" y2="290"/>
+		<line x1="820" y1="416.5" x2="893.6" y2="416.5"/>
+		<line x1="820" y1="520" x2="893.6" y2="416.5"/>
+		<line x1="893.6" y1="520" x2="820" y2="416.5"/>
+		<line x1="702.24" y1="290" x2="1011.36" y2="290"/>
+		<line x1="856.8" y1="232.5" x2="702.24" y2="290"/>
+		<line x1="856.8" y1="232.5" x2="1011.36" y2="290"/>
+	</g>
+	<rect x="805.28" y="273.9" width="103.04" height="18.400000000000002" fill="#2A1E26"/>
+	
+	<g fill="none" stroke="#2A1E26" stroke-width="4.75">
+		<line x1="1040" y1="520" x2="1040" y2="330"/>
+		<line x1="1100.8" y1="520" x2="1100.8" y2="330"/>
+		<line x1="1040" y1="434.5" x2="1100.8" y2="434.5"/>
+		<line x1="1040" y1="520" x2="1100.8" y2="434.5"/>
+		<line x1="1100.8" y1="520" x2="1040" y2="434.5"/>
+		<line x1="942.72" y1="330" x2="1198.08" y2="330"/>
+		<line x1="1070.4" y1="282.5" x2="942.72" y2="330"/>
+		<line x1="1070.4" y1="282.5" x2="1198.08" y2="330"/>
+	</g>
+	<rect x="1027.84" y="316.7" width="85.12" height="15.200000000000001" fill="#2A1E26"/>
+	<rect x="560" y="494" width="79.58223778754473" height="25" fill="#2C2028"/><rect x="641.5822377875447" y="494" width="70.04056763835251" height="25" fill="#2C2028"/><rect x="641.5822377875447" y="468" width="70.04056763835251" height="25" fill="#2C2028"/><rect x="713.6228054258972" y="494" width="78.92236882820725" height="25" fill="#2C2028"/><rect x="713.6228054258972" y="468" width="78.92236882820725" height="25" fill="#2C2028"/><rect x="713.6228054258972" y="442" width="78.92236882820725" height="25" fill="#2C2028"/><rect x="824.5451742541045" y="494" width="73.95335952751338" height="25" fill="#2C2028"/><rect x="824.5451742541045" y="468" width="73.95335952751338" height="25" fill="#2C2028"/><rect x="824.5451742541045" y="442" width="73.95335952751338" height="25" fill="#2C2028"/><rect x="900.4985337816179" y="494" width="86.22320398688316" height="25" fill="#2C2028"/><rect x="900.4985337816179" y="468" width="86.22320398688316" height="25" fill="#2C2028"/><rect x="1018.721737768501" y="494" width="98.38431023992598" height="25" fill="#2C2028"/><rect x="1119.106048008427" y="494" width="72.85105695948005" height="25" fill="#2C2028"/><rect x="1119.106048008427" y="468" width="72.85105695948005" height="25" fill="#2C2028"/><rect x="1193.957104967907" y="494" width="94.28659698925912" height="25" fill="#2C2028"/><rect x="1193.957104967907" y="468" width="94.28659698925912" height="25" fill="#2C2028"/>
+	<rect y="440" width="1280" height="120" fill="url(#fog)"/>
+	<rect x="700" y="534" width="72.75987457484007" height="25" fill="#1B151B"/><rect x="774.7598745748401" y="534" width="90.63655410893261" height="25" fill="#1B151B"/><rect x="774.7598745748401" y="508" width="90.63655410893261" height="25" fill="#1B151B"/><rect x="867.3964286837727" y="534" width="95.2612410672009" height="25" fill="#1B151B"/><rect x="994.6576697509736" y="534" width="103.37524714879692" height="25" fill="#1B151B"/><rect x="994.6576697509736" y="508" width="103.37524714879692" height="25" fill="#1B151B"/><rect x="1100.0329168997705" y="534" width="82.74860598146915" height="25" fill="#1B151B"/><rect x="1100.0329168997705" y="508" width="82.74860598146915" height="25" fill="#1B151B"/><rect x="1214.7815228812397" y="534" width="105.34186826087534" height="25" fill="#1B151B"/><rect x="1214.7815228812397" y="508" width="105.34186826087534" height="25" fill="#1B151B"/>
+	<rect y="520" width="1280" height="120" fill="url(#ground)"/>
+	<rect y="520" width="1280" height="2" fill="#F2B572" opacity="0.35"/>
+	<rect width="1280" height="640" fill="url(#shade)"/>
+	
+	<g transform="translate(600 540) rotate(-3) scale(0.66)">
+		<path fill="#060708" d="
+			M0,40 L60,20 L230,22 L250,10 L330,10 L340,24 L560,24 L560,16 L600,16 L600,24 L940,26 L940,22 L1000,22 L1000,40
+			L940,42 L600,44 L560,52 L420,52 L410,58 L380,58 L372,90 L356,128 L322,128 L330,92 L300,58 L250,58
+			L210,92 L170,96 L150,64 L70,70 L0,96 Z"/>
+		<rect x="300" y="-34" width="250" height="30" rx="14" fill="#060708"/>
+		<rect x="520" y="-44" width="70" height="50" rx="18" fill="#060708"/>
+		<rect x="270" y="-30" width="50" height="22" rx="10" fill="#060708"/>
+		<rect x="380" y="-10" width="18" height="20" fill="#060708"/>
+		<rect x="460" y="-10" width="18" height="20" fill="#060708"/>
+		<rect x="545" y="-38" width="6" height="38" fill="#FFB830" opacity="0.9"/>
+		<rect x="960" y="20" width="44" height="24" rx="3" fill="#060708"/>
+		<rect x="318" y="58" width="6" height="20" rx="2" fill="#060708"/>
+	</g>
+	
+	<g>
+		<circle cx="118" cy="210" r="46" fill="none" stroke="#FFFFFF" stroke-width="6.578000000000001"/>
+		<line x1="55.9" y1="210" x2="98.68" y2="210" stroke="#FFFFFF" stroke-width="4.6046000000000005" stroke-linecap="round"/>
+		<line x1="137.32" y1="210" x2="180.1" y2="210" stroke="#FFFFFF" stroke-width="4.6046000000000005" stroke-linecap="round"/>
+		<line x1="118" y1="147.9" x2="118" y2="190.68" stroke="#FFFFFF" stroke-width="4.6046000000000005" stroke-linecap="round"/>
+		<line x1="118" y1="229.32" x2="118" y2="272.1" stroke="#FFFFFF" stroke-width="4.6046000000000005" stroke-linecap="round"/>
+		<circle cx="118" cy="210" r="3.617900000000001" fill="#FFB830"/>
+		<line x1="69.69999999999999" y1="258.3" x2="166.3" y2="161.7" stroke="#FFB830" stroke-width="7.235800000000002" stroke-linecap="round"/>
+	</g>
+	
+	<text x="186" y="248" font-family="Bahnschrift, 'Arial Black', sans-serif" font-weight="700" font-size="118" letter-spacing="4.72"
+		fill="#FFFFFF" text-anchor="start" style="font-stretch: condensed">OFFSCOPE</text>
+	<text x="92" y="318" font-family="'Segoe UI', Arial, sans-serif" font-size="30" fill="#FFB830" font-weight="600">Uma bala. Sem mira. Só reflexo.</text>
+	<text x="92" y="372" font-family="'Segoe UI', Arial, sans-serif" font-size="19" fill="#C9C6BE">FPS de sniper no-scope para Roblox · 3 mapas · ranked · zero pay-to-win</text>
+	<g font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="700" fill="#0A0B0D">
+		<rect x="92" y="402" width="92" height="28" rx="6" fill="#FFB830"/><text x="138" y="421" text-anchor="middle">LUAU</text>
+		<rect x="194" y="402" width="92" height="28" rx="6" fill="#FFFFFF"/><text x="240" y="421" text-anchor="middle">ROJO</text>
+		<rect x="296" y="402" width="138" height="28" rx="6" fill="#FFFFFF"/><text x="365" y="421" text-anchor="middle">PROFILESTORE</text>
+		<rect x="444" y="402" width="138" height="28" rx="6" fill="#FFFFFF"/><text x="513" y="421" text-anchor="middle">FEITO C/ CLAUDE</text>
+	</g>
+	
+	<filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.05 0"/></filter>
+	<rect width="1280" height="640" filter="url(#grain)"/>
+	</svg>

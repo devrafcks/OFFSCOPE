@@ -1,0 +1,8 @@
+{
+  "name": "offscope-branding",
+  "private": true,
+  "type": "module",
+  "description": "Renderiza banner, thumbnail e ícone do OFFSCOPE a partir de SVG.",
+  "scripts": { "render": "node render.mjs" },
+  "dependencies": { "@resvg/resvg-js": "2.6.2" }
+}
