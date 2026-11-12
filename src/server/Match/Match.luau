@@ -359,13 +359,15 @@ function Match:_teamHealth(team: string): number
 	return total
 end
 
+-- W.O. só conta se o lado COMEÇOU com gente (teste solo no Studio não acaba na hora)
 function Match:_forfeitWinner(): string?
+	local initial = self.InitialTeams or { A = 0, B = 0, Total = 0 }
 	if self.Mode.TeamSize == 0 then
-		return if #self.Players <= 1 then "FFA" else nil
+		return if initial.Total > 1 and #self.Players <= 1 then "FFA" else nil
 	end
-	if #self.Teams.A == 0 and #self.Teams.B > 0 then
+	if initial.A > 0 and #self.Teams.A == 0 and #self.Teams.B > 0 then
 		return "B"
-	elseif #self.Teams.B == 0 and #self.Teams.A > 0 then
+	elseif initial.B > 0 and #self.Teams.B == 0 and #self.Teams.A > 0 then
 		return "A"
 	end
 	return nil
@@ -404,7 +406,9 @@ function Match:_playRounds()
 		self.EndsAt = serverNow() + mode.TimeLimit
 		self:Broadcast()
 		waitUntil(self.EndsAt, function()
-			return self:_aliveCount("A") == 0 or self:_aliveCount("B") == 0 or self:_forfeitWinner() ~= nil
+			local wipedA = #self.Teams.A > 0 and self:_aliveCount("A") == 0
+			local wipedB = #self.Teams.B > 0 and self:_aliveCount("B") == 0
+			return wipedA or wipedB or self:_forfeitWinner() ~= nil
 		end)
 
 		local forfeit = self:_forfeitWinner()
@@ -578,6 +582,7 @@ end
 function Match:_run()
 	self.Map = Registry.MapService.Load(self.MapId, self.Slot)
 	self:_assignTeams()
+	self.InitialTeams = { A = #self.Teams.A, B = #self.Teams.B, Total = #self.Players }
 	self:_killPlaneLoop()
 
 	table.insert(self._connections, Registry.DamageService.Killed:Connect(function(info, victimPlayer)
