@@ -33,25 +33,40 @@ local function now(): number
 	return Workspace:GetServerTimeNow()
 end
 
-function LagCompensation.Register(model: Model, player: Player?)
-	local parts: { [string]: BasePart } = {}
-	local sizes: { [string]: Vector3 } = {}
+--[[
+	Mantém as referências das partes atualizadas. Se alguma parte do corpo for trocada depois
+	do registro (acessório/descrição aplicada de novo, rig refeito), uma referência velha deixaria
+	essa zona fora do histórico. Custo: um FindFirstChild só quando a referência ficou órfã.
+]]
+local function resolveParts(track: Track)
+	local model = track.Model
 	for _, name in Hitbox.TrackedParts do
-		local part = model:FindFirstChild(name)
-		if part and part:IsA("BasePart") then
-			parts[name] = part
-			sizes[name] = part.Size
+		local part = track.Parts[name]
+		if not part or part.Parent ~= model then
+			local found = model:FindFirstChild(name)
+			if found and found:IsA("BasePart") then
+				track.Parts[name] = found
+				track.Sizes[name] = found.Size
+			else
+				track.Parts[name] = nil
+				track.Sizes[name] = nil
+			end
 		end
 	end
-	tracks[model] = {
+end
+
+function LagCompensation.Register(model: Model, player: Player?)
+	local track: Track = {
 		Model = model,
 		Player = player,
-		Parts = parts,
-		Sizes = sizes,
+		Parts = {},
+		Sizes = {},
 		Buffer = table.create(CAPACITY),
 		Head = 0,
 		Count = 0,
 	}
+	resolveParts(track)
+	tracks[model] = track
 	model.Destroying:Connect(function()
 		tracks[model] = nil
 	end)
@@ -70,6 +85,7 @@ function LagCompensation.Tracks(): { [Model]: Track }
 end
 
 local function record(track: Track, time: number)
+	resolveParts(track)
 	local cframes = {}
 	for name, part in track.Parts do
 		if part.Parent then

@@ -239,8 +239,15 @@ local function update(dt: number)
 	end
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	-- morto (ou personagem novo ainda sem Humanoid no respawn): só tira os modelos da tela.
+	-- Não mexe em `hidden` — antes isso "travava" a arma escondida depois do respawn.
 	if not humanoid or humanoid.Health <= 0 then
-		ViewmodelController.SetHidden(true)
+		if sniper.Model.Parent then
+			sniper.Model.Parent = nil
+		end
+		if knife.Model.Parent then
+			knife.Model.Parent = nil
+		end
 		return
 	end
 

@@ -173,13 +173,13 @@ function KillcamController.Stop()
 		dof.Enabled = false
 	end
 	CameraController.Suspend(false)
+	ViewmodelController.SetHidden(false)
 end
 
 function KillcamController.Init()
 	Remotes.Event("Killed").OnClientEvent:Connect(play)
 	player.CharacterAdded:Connect(function()
 		KillcamController.Stop()
-		ViewmodelController.SetHidden(false)
 	end)
 end
 
