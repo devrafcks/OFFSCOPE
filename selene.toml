@@ -3,3 +3,5 @@ std = "roblox"
 [lints]
 shadowing = "allow"
 multiple_statements = "allow"
+# Theme.New usa tabelas mistas de propósito (props + filhos)
+mixed_table = "allow"
