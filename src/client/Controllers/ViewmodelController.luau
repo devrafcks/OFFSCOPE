@@ -90,6 +90,18 @@ local function reachTransform(motor: Motor6D, target: Vector3): CFrame
 	return c0:Inverse() * CF(target) * (c0 - c0.Position)
 end
 
+-- Luz curta presa na arma: em mapa noturno a viewmodel não vira uma silhueta preta.
+-- Alcance pequeno (a viewmodel tem ~2 studs) para quase não iluminar o mundo.
+local function addFillLight(root: BasePart, range: number)
+	local light = Instance.new("PointLight")
+	light.Name = "ViewmodelFill"
+	light.Range = range
+	light.Brightness = 1.6
+	light.Color = Color3.fromRGB(255, 240, 222)
+	light.Shadows = false
+	light.Parent = root
+end
+
 local function destroyRig(rig: Rig?)
 	if rig then
 		rig.StopAnimation()
@@ -113,6 +125,7 @@ local function buildSniper(): Rig
 	local charm = CharmBuilder.Attach(root, built.CharmMount, charmDef and charmDef.Visual)
 
 	model:ScaleTo(SCALE)
+	addFillLight(root, 3.2)
 	for _, part in model:GetDescendants() do
 		if part:IsA("BasePart") then
 			part.CastShadow = false
@@ -146,6 +159,7 @@ local function buildKnife(): Rig
 	WrapPainter.PaintKnife(model, knifeId)
 	local right = ArmsBuilder.Build(built.Root, "RightArm", CFrame.Angles(rad(-90), 0, 0) * CF(0, 0, 0.05), Vector3.new(0.35, -0.6, 1.5), 1, 0.09)
 	model:ScaleTo(SCALE * 1.15)
+	addFillLight(built.Root, 2.6)
 	for _, part in model:GetDescendants() do
 		if part:IsA("BasePart") then
 			part.CastShadow = false
