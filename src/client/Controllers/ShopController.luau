@@ -322,7 +322,7 @@ function ShopController.Render()
 	clearContent()
 	RENDERERS[currentTab]()
 	for tab, button in refs.Tabs do
-		button.BackgroundColor3 = if tab == currentTab then C.Brand else C.PanelHi
+		Theme.SetButtonColor(button, if tab == currentTab then C.Brand else C.PanelHi)
 		button.TextColor3 = if tab == currentTab then C.Ink else C.Text
 	end
 	local profile = ClientState.Profile
