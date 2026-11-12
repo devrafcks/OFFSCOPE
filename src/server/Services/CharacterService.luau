@@ -187,6 +187,17 @@ local function applyHoldPose(character: Model)
 		left:SetAttribute("BaseC0", left.C0)
 		left.C0 = left.C0 * CFrame.Angles(0, math.rad(-32), 0) * CFrame.Angles(math.rad(84), 0, 0)
 	end
+	-- o cliente aplica o tilt de pitch em cima destes C0 (HoldC0 replica como atributo)
+	for _, motor in { right, left } do
+		if motor then
+			motor:SetAttribute("HoldC0", motor.C0)
+		end
+	end
+	local head = character:FindFirstChild("Head")
+	local neck = head and head:FindFirstChild("Neck")
+	if neck and neck:IsA("Motor6D") then
+		neck:SetAttribute("HoldC0", neck.C0)
+	end
 end
 
 -- ── spawn ────────────────────────────────────────────────────────────────────
