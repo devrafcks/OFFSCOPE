@@ -29,6 +29,8 @@ Lobby (range de treino · pads de fila · loja · ranking)
 ```
 
 - **Lobby** é em primeira pessoa e com a arma na mão: dá para treinar no range enquanto espera a fila.
+  Cenário: hangar militar a céu aberto na serra — praça com portais de fila, monólito com vitrines
+  da arma, heliponto com helicóptero, pátio de contêineres, Arsenal (loja) e quadro de ranking.
 - Recompensas (moedas, XP, XP de passe) saem no fim de cada partida e a cada kill estilosa.
 
 ## 3. Modos
