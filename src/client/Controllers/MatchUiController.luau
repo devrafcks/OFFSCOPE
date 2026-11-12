@@ -380,6 +380,10 @@ function MatchUiController.Init()
 		render(match)
 		if not match or match.State ~= "Vote" then
 			renderVote(nil)
+			-- partida emendada após o voto: devolve o mouse para a mira
+			if match and ClientState.UiOpen then
+				ClientState.SetUiOpen(false)
+			end
 		end
 	end)
 	ClientState.VoteChanged:Connect(function(vote)
