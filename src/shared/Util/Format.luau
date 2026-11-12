@@ -1,4 +1,3 @@
---!strict
 -- Formatação pt-BR: milhar com ponto, tempo mm:ss, distância em metros.
 
 local Format = {}

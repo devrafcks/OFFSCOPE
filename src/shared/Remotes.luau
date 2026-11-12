@@ -1,4 +1,3 @@
---!strict
 --[[
 	Remotes — lista única de RemoteEvents/Functions.
 	O servidor cria as instâncias em ReplicatedStorage.Remotes; o cliente espera por elas.
@@ -48,12 +47,13 @@ local UNRELIABLE = {
 
 local Remotes = {}
 
-local folder: Folder
+local cached: Folder? = nil
 
 local function ensureFolder(): Folder
-	if folder then
-		return folder
+	if cached then
+		return cached
 	end
+	local folder: Folder
 	if RunService:IsServer() then
 		local existing = ReplicatedStorage:FindFirstChild("Remotes")
 		if existing then
@@ -82,6 +82,7 @@ local function ensureFolder(): Folder
 	else
 		folder = ReplicatedStorage:WaitForChild("Remotes") :: Folder
 	end
+	cached = folder
 	return folder
 end
 

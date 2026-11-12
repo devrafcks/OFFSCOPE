@@ -1,4 +1,3 @@
---!strict
 -- Maid: junta conexões, instâncias, threads e funções para limpar de uma vez.
 
 export type Maid = {

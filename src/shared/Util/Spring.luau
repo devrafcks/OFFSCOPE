@@ -1,4 +1,3 @@
---!strict
 -- Mola amortecida (semi-implícita) para Vector3 — usada em sway, recoil e bob da viewmodel.
 
 export type Spring = {

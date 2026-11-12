@@ -1,4 +1,3 @@
---!strict
 -- Signal mínimo (sem BindableEvent): conexões em lista, Fire síncrono, Wait com coroutine.
 
 export type Connection = { Connected: boolean, Disconnect: (self: Connection) -> () }

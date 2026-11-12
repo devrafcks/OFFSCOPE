@@ -1,4 +1,3 @@
---!strict
 --[[
 	OFFSCOPE — Config
 	ÚNICO lugar de números de gameplay, economia, rede, strings de produto e IDs.
