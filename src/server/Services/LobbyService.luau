@@ -11,6 +11,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 
 local Shared = ReplicatedStorage.Shared
 local Config = require(Shared.Config)
+local DummyBuilder = require(Shared.Models.DummyBuilder)
 local Format = require(Shared.Util.Format)
 local Registry = require(script.Parent.Parent.Registry)
 local LobbyMap = require(ServerScriptService.Server.Maps.Lobby)
@@ -51,8 +52,9 @@ local function buildPadGui(modeId: string, cf: CFrame)
 	anchor.Parent = built.Model
 
 	local gui = Instance.new("BillboardGui")
-	gui.Size = UDim2.fromOffset(240, 96)
-	gui.MaxDistance = 120
+	-- tamanho em studs: encolhe com a distância e os rótulos dos pads não se sobrepõem
+	gui.Size = UDim2.fromScale(9, 3.6)
+	gui.MaxDistance = 90
 	gui.LightInfluence = 0
 	gui.AlwaysOnTop = false
 	gui.Parent = anchor
@@ -143,6 +145,7 @@ local function getTemplate(): Model?
 	if animate then
 		animate:Destroy()
 	end
+	DummyBuilder.Dress(model)
 	dummyTemplate = model
 	return model
 end
