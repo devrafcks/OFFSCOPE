@@ -10,12 +10,14 @@
 	   5. olhar vs. olhar replicado (cone anti silent-aim → só log)
 	   6. rewind das hitboxes para o instante que o atirador VIA
 	   7. raycast no mundo (sem personagens) → distância de linha de visão
-	   8. raio × OBBs rebobinadas (+padding) → alvo mais próximo antes da parede
+	   8. raio × OBBs rebobinadas (+padding) → personagem mais próximo antes da parede;
+	      dentro dele vale a zona mais nobre atravessada (braço não blinda cabeça/tronco)
 	   9. dano por zona/distância → DamageService
 	  10. HitConfirm para o atirador, ShotFx para os outros
 ]]
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
@@ -99,7 +101,6 @@ function HitscanService.Cast(origin: Vector3, direction: Vector3, rewindTime: nu
 	local bestT = math.huge
 	local bestModel: Model? = nil
 	local bestPart: string? = nil
-	local bestPriority = 0
 	local padding = Config.Netcode.HitboxPadding
 
 	for model, track in Registry.LagCompensation.Tracks() do
@@ -123,6 +124,12 @@ function HitscanService.Cast(origin: Vector3, direction: Vector3, rewindTime: nu
 				continue
 			end
 		end
+		-- Dentro do MESMO personagem vale a zona mais nobre que o raio atravessa:
+		-- braço e mão (que ficam na frente do peito ao segurar a arma) não blindam cabeça/tronco.
+		-- Entre personagens diferentes, vence o mais próximo.
+		local modelT = math.huge
+		local modelPart: string? = nil
+		local modelPriority = 0
 		for name, cframe in snapshot do
 			local size = track.Sizes[name]
 			if not size then
@@ -130,16 +137,18 @@ function HitscanService.Cast(origin: Vector3, direction: Vector3, rewindTime: nu
 			end
 			local t = Hitbox.RayOBB(origin, direction, cframe, size, padding)
 			if t and t <= worldDistance then
-				local zone = Hitbox.ZoneOf(name)
-				local priority = Hitbox.ZonePriority[zone]
-				-- empate (< 0,15 stud): a zona mais nobre vence (cabeça na frente do ombro)
-				if t < bestT - 0.15 or (math.abs(t - bestT) <= 0.15 and priority > bestPriority) then
-					bestT = t
-					bestModel = model
-					bestPart = name
-					bestPriority = priority
+				local priority = Hitbox.ZonePriority[Hitbox.ZoneOf(name)]
+				if priority > modelPriority or (priority == modelPriority and t < modelT) then
+					modelT = t
+					modelPart = name
+					modelPriority = priority
 				end
 			end
+		end
+		if modelPart and modelT < bestT then
+			bestT = modelT
+			bestModel = model
+			bestPart = modelPart
 		end
 	end
 
@@ -232,6 +241,21 @@ local function onFire(player: Player, origin: any, look: any, seed: any, spread:
 	local result = HitscanService.Cast(origin, direction, rewind, character, function(model)
 		return DamageService.CanDamage(player, model)
 	end)
+	if Config.Studio.DebugHits and RunService:IsStudio() then
+		print(
+			string.format(
+				"[Hit] %s → %s/%s t=%.2f rewind=%.3fs spread=%.3f° (cliente %.3f°) desvio=%.2f°",
+				player.Name,
+				tostring(result.Model and result.Model.Name),
+				tostring(result.Part),
+				result.Distance,
+				Registry.LagCompensation.Now() - rewind,
+				usedSpread,
+				spread,
+				math.deg(math.acos(math.clamp(direction:Dot(look), -1, 1)))
+			)
+		)
+	end
 
 	-- 9. dano
 	local confirm = { ShotId = shotId, Hit = false }

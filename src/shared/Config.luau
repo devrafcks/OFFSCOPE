@@ -29,6 +29,8 @@ Config.Studio = {
 	BonusCoins = 50000,
 	-- Mínimo de jogadores para começar uma partida no Studio (1 = testar sozinho contra ninguém).
 	MinPlayersOverride = nil :: number?,
+	-- Loga cada tiro no Output do servidor (parte, zona, rewind, desvio do spread). Só no Studio.
+	DebugHits = false,
 }
 
 -- ─────────────────────────────────────────────────────────────── dados
