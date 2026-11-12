@@ -7,6 +7,25 @@
 > Enquanto um ID for `0`, o botão de Robux **simula a compra no Studio** (`Config.Studio.SimulateRobuxPurchases`)
 > e, fora do Studio, mostra "Produto ainda não configurado". Moedas funcionam sempre.
 
+## Criar todos de uma vez (recomendado)
+
+Depois de publicar a experiência:
+
+1. Creator Hub → **Open Cloud → API Keys** → crie uma chave com a API **Developer Products**
+   (escopo `developer-product:write`) liberada para esta experiência.
+2. Copie o **Universe ID** (Creator Hub → experiência → ⋯ → *Copy Universe ID*).
+3. Na raiz do repositório, crie um `.env` (já está no `.gitignore`):
+   ```
+   ROBLOX_API_KEY=sua-chave
+   ROBLOX_UNIVERSE_ID=1234567890
+   ```
+4. Rode `node tools/products/create.mjs --dry-run` para conferir e depois sem `--dry-run`.
+
+O script cria os 34 produtos com nome, descrição e preço do `Config.luau`, grava cada ID de volta
+no Config e guarda um cache em `tools/products/created.json` — rodar de novo não duplica nada.
+A API de developer products da Open Cloud ainda é **beta**: se ela recusar, a tabela abaixo é o
+caminho manual (Monetização → Developer Products).
+
 ## Pacotes
 
 | Chave no Config | Nome do produto | Preço (R$) |
