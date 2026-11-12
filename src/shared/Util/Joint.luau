@@ -42,4 +42,19 @@ function Joint.SetC0(joint: Instance, c0: CFrame)
 	end
 end
 
+--[[
+	Aplica a pose "hold" (C0 desejado) na junta, por frame.
+	• Motor6D: C0 = hold (a animação continua compondo no Transform).
+	• AnimationConstraint: o Animator recalcula o Transform a partir do rig original e
+	  anularia qualquer mudança no Attachment0; então sobrescrevemos o próprio Transform
+	  (chame em RunService.PreSimulation, depois da animação e antes da física).
+]]
+function Joint.ApplyHold(joint: Instance, base: CFrame, hold: CFrame)
+	if joint:IsA("Motor6D") then
+		joint.C0 = hold
+	elseif joint:IsA("AnimationConstraint") then
+		joint.Transform = base:Inverse() * hold
+	end
+end
+
 return Joint

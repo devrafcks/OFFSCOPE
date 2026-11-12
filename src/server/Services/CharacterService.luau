@@ -191,7 +191,9 @@ local function applyHoldPose(character: Model)
 		end
 		joint:SetAttribute("BaseC0", base)
 		local hold = base * offset
-		Joint.SetC0(joint, hold)
+		if joint:IsA("Motor6D") then
+			Joint.SetC0(joint, hold) -- replica; AnimationConstraint é posado por frame no cliente
+		end
 		-- o cliente aplica o tilt de pitch em cima deste C0 (HoldC0 replica como atributo)
 		joint:SetAttribute("HoldC0", hold)
 	end

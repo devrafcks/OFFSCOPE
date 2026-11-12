@@ -1,8 +1,8 @@
 --[[
 	CharacterPoseController — corpos em 3ª pessoa.
 	• Meu personagem: invisível para mim (a câmera fica dentro da cabeça; a viewmodel é a arma).
-	• Os outros: braços e arma inclinam com o pitch replicado (atributo "Pitch", ~12 Hz),
-	  suavizado localmente. Só C0 local dos ombros — o servidor não gasta nada com isso.
+	• Todos: braços e arma inclinam com o pitch replicado (atributo "Pitch", ~12 Hz),
+	  suavizado localmente. Motor6D → C0; AnimationConstraint (avatar novo) → Transform por frame.
 ]]
 
 local Players = game:GetService("Players")
@@ -26,11 +26,25 @@ local function hideOwn(character: Model)
 	end
 end
 
-local function poseOthers(dt: number)
+-- pose "segurando a arma" + tilt de pitch numa junta (Motor6D ou AnimationConstraint)
+local function hold(joint: Instance?, tilt: CFrame, isSelf: boolean)
+	if not joint then
+		return
+	end
+	local base = joint:GetAttribute("BaseC0") :: CFrame?
+	local held = joint:GetAttribute("HoldC0") :: CFrame?
+	if not base or not held then
+		return
+	end
+	-- Motor6D do próprio personagem já vem com o C0 replicado pelo servidor
+	if isSelf and joint:IsA("Motor6D") then
+		return
+	end
+	Joint.ApplyHold(joint, base, held * tilt)
+end
+
+local function poseCharacters(dt: number)
 	for _, other in Players:GetPlayers() do
-		if other == player then
-			continue
-		end
 		local character = other.Character
 		if not character then
 			continue
@@ -39,25 +53,11 @@ local function poseOthers(dt: number)
 		local value = smoothed[character] or target
 		value += (target - value) * math.min(1, dt * 12)
 		smoothed[character] = value
+		local isSelf = other == player
 		local tilt = CFrame.Angles(math.clamp(value, -1.2, 1.2) * 0.85, 0, 0)
-		for _, name in { "RightUpperArm", "LeftUpperArm" } do
-			local arm = character:FindFirstChild(name)
-			local shoulder = Joint.Find(arm, if name == "RightUpperArm" then "RightShoulder" else "LeftShoulder")
-			if shoulder then
-				-- C0 de "segurar a arma" que o servidor replicou como atributo
-				local base = shoulder:GetAttribute("HoldC0") :: CFrame?
-				if base then
-					Joint.SetC0(shoulder, base * tilt)
-				end
-			end
-		end
-		local neck = Joint.Find(character:FindFirstChild("Head"), "Neck")
-		if neck then
-			local base = neck:GetAttribute("HoldC0") :: CFrame?
-			if base then
-				Joint.SetC0(neck, base * CFrame.Angles(math.clamp(value, -1, 1) * 0.6, 0, 0))
-			end
-		end
+		hold(Joint.Find(character:FindFirstChild("RightUpperArm"), "RightShoulder"), tilt, isSelf)
+		hold(Joint.Find(character:FindFirstChild("LeftUpperArm"), "LeftShoulder"), tilt, isSelf)
+		hold(Joint.Find(character:FindFirstChild("Head"), "Neck"), CFrame.Angles(math.clamp(value, -1, 1) * 0.6, 0, 0), isSelf)
 	end
 	for character in smoothed do
 		if not character.Parent then
@@ -82,7 +82,7 @@ function CharacterPoseController.Start()
 	end
 	player.CharacterAdded:Connect(onCharacter)
 
-	RunService.RenderStepped:Connect(function(dt)
+	RunService.RenderStepped:Connect(function()
 		-- o TransparencyController padrão pode reescrever; garantimos todo frame (barato)
 		local character = player.Character
 		if character then
@@ -92,8 +92,9 @@ function CharacterPoseController.Start()
 				end
 			end
 		end
-		poseOthers(dt)
 	end)
+	-- depois do Animator e antes da física: é aqui que o Transform das AnimationConstraints vale
+	RunService.PreSimulation:Connect(poseCharacters)
 end
 
 return CharacterPoseController
