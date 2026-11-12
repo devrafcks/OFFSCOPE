@@ -7,6 +7,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
 local Config = require(Shared.Config)
@@ -60,8 +61,9 @@ function MenuController.OpenModal(frame: Frame)
 	openModal = frame
 	frame.Visible = true
 	local scale = frame:FindFirstChildOfClass("UIScale") or New("UIScale", { Parent = frame })
-	scale.Scale = 0.94
-	Theme.Tween(scale, 0.22, { Scale = 1 }, Enum.EasingStyle.Back)
+	local fit = Theme.FitScale(frame)
+	scale.Scale = fit * 0.94
+	Theme.Tween(scale, 0.22, { Scale = fit }, Enum.EasingStyle.Back)
 	ClientState.SetUiOpen(true)
 	Audio.Play2D("UiClick")
 end
@@ -72,11 +74,12 @@ local function modal(name: string, title: string, size: Vector2): Frame
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
 		Size = UDim2.fromOffset(size.X, size.Y),
-		BackgroundTransparency = 0.04,
+		BackgroundTransparency = 0,
 		Visible = false,
 		ZIndex = 10,
 		Parent = gui,
 	})
+	Theme.Fit(frame, size)
 	Theme.Label({ Text = title, FontFace = Theme.Fonts.Display, TextSize = 26, Position = UDim2.fromOffset(26, 20), Size = UDim2.new(1, -100, 0, 32), Parent = frame })
 	local close = Theme.Button("×", "Ghost", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -18, 0, 18), Size = UDim2.fromOffset(36, 36), TextSize = 24, Parent = frame })
 	close.Activated:Connect(MenuController.CloseModal)
@@ -85,7 +88,17 @@ end
 
 -- ── perfil ─────────────────────────────────────────────────────────────────
 local function buildProfileCard()
-	local card = Theme.Panel({ Name = "Profile", Position = UDim2.fromOffset(24, 24), Size = UDim2.fromOffset(300, 116), Parent = gui })
+	-- coluna à esquerda, abaixo da área do chat do Roblox (que ocupa o canto superior esquerdo)
+	refs.LeftColumn = New("Frame", {
+		Name = "LeftColumn",
+		AnchorPoint = Vector2.new(0, 0.5),
+		Position = UDim2.new(0, 24, 0.55, 0),
+		Size = UDim2.fromOffset(300, 278),
+		BackgroundTransparency = 1,
+		Parent = gui,
+		Theme.List(nil, 12),
+	})
+	local card = Theme.Panel({ Name = "Profile", LayoutOrder = 1, Size = UDim2.fromOffset(300, 116), Parent = refs.LeftColumn })
 	refs.Name = Theme.Label({ Text = player.DisplayName, FontFace = Theme.Fonts.Title, TextSize = 18, Position = UDim2.fromOffset(16, 12), Size = UDim2.fromOffset(200, 22), Parent = card })
 	refs.Level = Theme.Label({ Text = "NÍVEL 1", FontFace = Theme.Fonts.Title, TextSize = 12, TextColor3 = C.TextDim, Position = UDim2.fromOffset(16, 36), Size = UDim2.fromOffset(120, 14), Parent = card })
 	local xpBack = New("Frame", { Position = UDim2.fromOffset(16, 54), Size = UDim2.new(1, -32, 0, 4), BackgroundColor3 = C.Line, BorderSizePixel = 0, Parent = card, Theme.Corner(2) })
@@ -110,7 +123,7 @@ end
 
 -- ── desafios do dia ────────────────────────────────────────────────────────
 local function buildChallenges()
-	local panel = Theme.Panel({ Name = "Challenges", Position = UDim2.fromOffset(24, 152), Size = UDim2.fromOffset(300, 150), Parent = gui })
+	local panel = Theme.Panel({ Name = "Challenges", LayoutOrder = 2, Size = UDim2.fromOffset(300, 150), Parent = refs.LeftColumn })
 	Theme.Label({ Text = "DESAFIOS DO DIA", FontFace = Theme.Fonts.Title, TextSize = 12, TextColor3 = C.TextDim, Position = UDim2.fromOffset(16, 12), Size = UDim2.fromOffset(200, 14), Parent = panel })
 	refs.ChallengeList = New("Frame", { Position = UDim2.fromOffset(16, 32), Size = UDim2.new(1, -32, 1, -40), BackgroundTransparency = 1, Parent = panel, Theme.List(nil, 8) })
 	refs.Challenges = panel
@@ -156,7 +169,7 @@ local function buildActions()
 		Parent = gui,
 		Theme.List(nil, 10, Enum.HorizontalAlignment.Right),
 	})
-	local play = Theme.Button("JOGAR", "Primary", { LayoutOrder = 1, Size = UDim2.fromOffset(220, 56), TextSize = 22, Parent = column })
+	local play = Theme.Button("JOGAR  [P]", "Primary", { LayoutOrder = 1, Size = UDim2.fromOffset(220, 56), TextSize = 22, Parent = column })
 	local shop = Theme.Button("LOJA  [B]", "Ghost", { LayoutOrder = 2, Size = UDim2.fromOffset(220, 44), Parent = column })
 	local settings = Theme.Button("CONFIGURAÇÕES  [M]", "Ghost", { LayoutOrder = 3, Size = UDim2.fromOffset(220, 44), Parent = column })
 	play.Activated:Connect(function()
@@ -225,7 +238,8 @@ local function buildPlayModal()
 			local badge = Theme.Label({ Text = "RANKED", FontFace = Theme.Fonts.Title, TextSize = 11, TextColor3 = C.Ink, BackgroundColor3 = accent, BackgroundTransparency = 0, TextXAlignment = Enum.TextXAlignment.Center, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -12, 0, 14), Size = UDim2.fromOffset(64, 18), Parent = card })
 			Theme.Corner(4).Parent = badge
 		end
-		Theme.Label({ Text = string.upper(mode.DisplayName), FontFace = Theme.Fonts.Display, TextSize = 22, Position = UDim2.fromOffset(16, 40), Size = UDim2.new(1, -32, 0, 26), Parent = card })
+		local title = Theme.Label({ Text = string.upper(mode.DisplayName), FontFace = Theme.Fonts.Display, TextScaled = true, Position = UDim2.fromOffset(16, 40), Size = UDim2.new(1, -32, 0, 26), Parent = card })
+		New("UITextSizeConstraint", { MaxTextSize = 22, Parent = title })
 		Theme.Label({ Text = mode.Description, FontFace = Theme.Fonts.Body, TextSize = 13, TextColor3 = C.TextDim, TextWrapped = true, Position = UDim2.fromOffset(16, 70), Size = UDim2.new(1, -32, 0, 40), TextYAlignment = Enum.TextYAlignment.Top, Parent = card })
 		Theme.Label({ Text = `{mode.Players} jogadores`, FontFace = Theme.Fonts.Mono, TextSize = 12, TextColor3 = accent, Position = UDim2.new(0, 16, 1, -32), Size = UDim2.fromOffset(160, 16), Parent = card })
 		card.MouseEnter:Connect(function()
@@ -346,26 +360,46 @@ local function buildHints()
 	local text = if touch
 		then "Arraste à direita para mirar · ATIRAR · SCOPE · FACA · SLIDE · CORRER"
 		else "LMB atirar  ·  RMB scope  ·  SHIFT correr  ·  C slide  ·  Q faca  ·  V faca rápida  ·  R recarregar  ·  F inspecionar  ·  TAB placar"
-	local label = Theme.Label({
+	-- fundo escuro atrás do texto: legível sobre qualquer cenário (céu claro, neon, noite)
+	local pill = New("Frame", {
 		Name = "Hints",
+		AnchorPoint = Vector2.new(0.5, 1),
+		Position = UDim2.new(0.5, 0, 1, -10),
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 28),
+		BackgroundColor3 = C.Ink,
+		BackgroundTransparency = 0.25,
+		BorderSizePixel = 0,
+		Parent = gui,
+		Theme.Corner(14),
+		Theme.Padding(0, 14),
+	})
+	Theme.Label({
 		Text = text,
 		FontFace = Theme.Fonts.Body,
-		TextSize = 13,
-		TextColor3 = C.TextDim,
+		TextSize = 14,
+		TextColor3 = C.Text,
 		TextXAlignment = Enum.TextXAlignment.Center,
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -12),
-		Size = UDim2.new(1, -40, 0, 18),
-		Parent = gui,
+		AutomaticSize = Enum.AutomaticSize.X,
+		Size = UDim2.fromOffset(0, 28),
+		Parent = pill,
 	})
-	refs.Hints = label
+	Theme.Fit(pill, Vector2.new(980, 28), 16)
+	refs.Hints = pill
+end
+
+-- tela baixa (celular deitado): só o essencial, sem empilhar painéis sobre o jogo
+local function isCompact(): boolean
+	local camera = Workspace.CurrentCamera
+	return camera ~= nil and camera.ViewportSize.Y < 600
 end
 
 local function renderVisibility()
 	local inMatch = ClientState.InMatch()
+	local compact = isCompact()
 	for _, key in { "Profile", "Challenges", "Actions", "Hints" } do
 		if refs[key] then
-			refs[key].Visible = not inMatch
+			refs[key].Visible = not inMatch and not (compact and (key == "Challenges" or key == "Hints"))
 		end
 	end
 	if inMatch then
@@ -393,9 +427,17 @@ function MenuController.Init()
 	ClientState.ProfileChanged:Connect(renderProfile)
 	ClientState.QueueChanged:Connect(renderQueue)
 	ClientState.MatchChanged:Connect(renderVisibility)
+	if Workspace.CurrentCamera then
+		Workspace.CurrentCamera:GetPropertyChangedSignal("ViewportSize"):Connect(renderVisibility)
+	end
 	InputController.Pressed:Connect(function(action)
 		if action == "Menu" then
 			MenuController.OpenModal(refs.SettingsModal)
+		elseif action == "Play" then
+			-- o mouse fica travado no lobby (FPS): o atalho abre os modos e libera o cursor
+			if not ClientState.InMatch() then
+				MenuController.OpenModal(refs.PlayModal)
+			end
 		elseif action == "Shop" then
 			if not ClientState.InMatch() then
 				MenuController.CloseModal()

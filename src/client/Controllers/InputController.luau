@@ -36,6 +36,7 @@ local BINDINGS = {
 	Scoreboard = { Enum.KeyCode.Tab, Enum.KeyCode.ButtonSelect },
 	Shop = { Enum.KeyCode.B },
 	Menu = { Enum.KeyCode.M, Enum.KeyCode.ButtonStart },
+	Play = { Enum.KeyCode.P },
 }
 
 -- Ações que não disparam com UI aberta (para não atirar clicando na loja)

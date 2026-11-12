@@ -109,6 +109,7 @@ local function buildScoreboard()
 		Visible = false,
 		Parent = gui,
 	})
+	Theme.Fit(board, Vector2.new(620, 420))
 	refs.BoardTitle = Theme.Label({ Text = "", FontFace = Theme.Fonts.Display, TextSize = 22, Position = UDim2.fromOffset(20, 14), Size = UDim2.new(1, -40, 0, 28), Parent = board })
 	refs.BoardSub = Theme.Label({ Text = "", FontFace = Theme.Fonts.Body, TextSize = 14, TextColor3 = C.TextDim, Position = UDim2.fromOffset(20, 42), Size = UDim2.new(1, -40, 0, 18), Parent = board })
 	local header = New("Frame", { Position = UDim2.fromOffset(20, 72), Size = UDim2.new(1, -40, 0, 18), BackgroundTransparency = 1, Parent = board })
@@ -151,6 +152,7 @@ local function buildVote()
 		Visible = false,
 		Parent = gui,
 	})
+	Theme.Fit(panel, Vector2.new(760, 300))
 	Theme.Label({ Text = "PRÓXIMO MAPA", FontFace = Theme.Fonts.Display, TextSize = 24, Position = UDim2.fromOffset(24, 18), Size = UDim2.fromOffset(400, 30), Parent = panel })
 	refs.VoteTimer = Theme.Label({ Text = "", FontFace = Theme.Fonts.Mono, TextSize = 18, TextColor3 = C.Brand, TextXAlignment = Enum.TextXAlignment.Right, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -24, 0, 22), Size = UDim2.fromOffset(120, 24), Parent = panel })
 	refs.VoteRow = New("Frame", {
