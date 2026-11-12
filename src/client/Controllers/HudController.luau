@@ -626,7 +626,8 @@ local function update(dt: number)
 		healthLag = ratio
 	end
 	refs.HealthLag.Size = UDim2.fromScale(healthLag, 1)
-	local danger = math.clamp((0.45 - ratio) / 0.45, 0, 1) * (0.75 + math.sin(os.clock() * 5) * 0.25)
+	-- só pulsa com vida baixa e viva: morto/na votação a borda vermelha some
+	local danger = if inCombat and health > 0 then math.clamp((0.45 - ratio) / 0.45, 0, 1) * (0.75 + math.sin(os.clock() * 5) * 0.25) else 0
 	for _, edge in refs.Vignette:GetChildren() do
 		(edge :: Frame).BackgroundTransparency = 1 - danger * 0.8
 	end
