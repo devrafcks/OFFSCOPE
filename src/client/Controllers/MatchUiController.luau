@@ -231,7 +231,7 @@ local function renderBoard(match)
 			Theme.Corner(6),
 		})
 		New("Frame", { Size = UDim2.new(0, 3, 1, 0), BackgroundColor3 = teamColor(row.Team), BorderSizePixel = 0, Parent = line })
-		Theme.Label({ Text = row.Name .. (if row.Alive then "" else "  ✕"), FontFace = Theme.Fonts.Title, TextSize = 15, Position = UDim2.fromOffset(12, 0), Size = UDim2.fromScale(0.58, 1), Parent = line })
+		Theme.Label({ Text = row.Name .. (if row.Alive then "" else "  ×"), FontFace = Theme.Fonts.Title, TextSize = 15, Position = UDim2.fromOffset(12, 0), Size = UDim2.fromScale(0.58, 1), Parent = line })
 		Theme.Label({ Text = tostring(row.Kills), FontFace = Theme.Fonts.Mono, TextSize = 15, TextXAlignment = Enum.TextXAlignment.Center, Position = UDim2.fromScale(0.6, 0), Size = UDim2.fromScale(0.13, 1), Parent = line })
 		Theme.Label({ Text = tostring(row.Deaths), FontFace = Theme.Fonts.Mono, TextSize = 15, TextColor3 = C.TextDim, TextXAlignment = Enum.TextXAlignment.Center, Position = UDim2.fromScale(0.73, 0), Size = UDim2.fromScale(0.13, 1), Parent = line })
 	end

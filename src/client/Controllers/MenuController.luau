@@ -78,7 +78,7 @@ local function modal(name: string, title: string, size: Vector2): Frame
 		Parent = gui,
 	})
 	Theme.Label({ Text = title, FontFace = Theme.Fonts.Display, TextSize = 26, Position = UDim2.fromOffset(26, 20), Size = UDim2.new(1, -100, 0, 32), Parent = frame })
-	local close = Theme.Button("✕", "Ghost", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -18, 0, 18), Size = UDim2.fromOffset(36, 36), TextSize = 16, Parent = frame })
+	local close = Theme.Button("×", "Ghost", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -18, 0, 18), Size = UDim2.fromOffset(36, 36), TextSize = 24, Parent = frame })
 	close.Activated:Connect(MenuController.CloseModal)
 	return frame
 end

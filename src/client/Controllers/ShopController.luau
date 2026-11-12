@@ -84,7 +84,7 @@ local function preview(parent: Instance, item: Catalog.Item): ViewportFrame
 		-- ícone tipográfico para efeitos/retículos/tracers
 		viewport:Destroy()
 		local color = item.Visual.Color or Config.Rarities[item.Rarity].Color
-		local glyph = if category == "Reticle" then (if item.Visual.Shape == "Cross" then "+" else "•") elseif category == "Tracer" then "━━━" elseif category == "Finisher" then "☾" else "✦"
+		local glyph = if category == "Reticle" then (if item.Visual.Shape == "Cross" then "+" else "•") elseif category == "Tracer" then "━━━" elseif category == "Finisher" then "◉" else "★"
 		local tile = New("Frame", { Size = UDim2.new(1, 0, 0, 110), BackgroundTransparency = 1, Parent = parent })
 		Theme.Label({ Text = glyph, FontFace = Theme.Fonts.Display, TextSize = 54, TextColor3 = color, TextXAlignment = Enum.TextXAlignment.Center, Size = UDim2.fromScale(1, 1), Parent = tile })
 		return nil :: any
@@ -389,7 +389,7 @@ local function build()
 	Theme.Label({ Text = "ARSENAL", FontFace = Theme.Fonts.Display, TextSize = 30, Position = UDim2.fromOffset(28, 20), Size = UDim2.fromOffset(300, 34), Parent = window })
 	refs.Subtitle = Theme.Label({ Text = "", FontFace = Theme.Fonts.Body, TextSize = 13, TextColor3 = C.TextDim, Position = UDim2.fromOffset(28, 56), Size = UDim2.fromOffset(600, 16), Parent = window })
 	refs.Coins = Theme.Label({ Text = "◆ 0", FontFace = Theme.Fonts.Display, TextSize = 22, TextColor3 = C.Coin, TextXAlignment = Enum.TextXAlignment.Right, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -76, 0, 26), Size = UDim2.fromOffset(240, 26), Parent = window })
-	local close = Theme.Button("✕", "Ghost", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -20, 0, 20), Size = UDim2.fromOffset(40, 40), Parent = window })
+	local close = Theme.Button("×", "Ghost", { AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -20, 0, 20), Size = UDim2.fromOffset(40, 40), TextSize = 26, Parent = window })
 	close.Activated:Connect(ShopController.Close)
 
 	local tabs = New("Frame", {
