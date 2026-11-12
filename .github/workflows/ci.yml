@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    name: Build · type-check · lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar Rokit
+        run: |
+          curl -sSf https://raw.githubusercontent.com/rojo-rbx/rokit/main/scripts/install.sh | bash
+          echo "$HOME/.rokit/bin" >> "$GITHUB_PATH"
+
+      - name: Instalar ferramentas fixadas (rokit.toml)
+        run: |
+          rokit authenticate github --token "${{ secrets.GITHUB_TOKEN }}" --skip-verify
+          rokit install --no-trust-check
+
+      - name: Pacotes Wally
+        run: wally install
+
+      - name: Validar (rojo build + luau-lsp + selene)
+        run: ./scripts/check.sh
+
+      - name: Publicar o place como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: offscope-place
+          path: .tooling/offscope.rbxl
