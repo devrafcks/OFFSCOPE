@@ -104,8 +104,11 @@ local function buildSniper(): Rig
 	local stop = WrapPainter.Apply(model, ClientState.Equipped("Wrap"), { Textures = true, Animate = true })
 
 	local root = built.Root
-	local right = ArmsBuilder.Build(root, "RightArm", (attachment(root, "RightGrip") :: Attachment).CFrame, Vector3.new(0.45, -0.75, 1.6), 1)
-	local left = ArmsBuilder.Build(root, "LeftArm", (attachment(root, "LeftGrip") :: Attachment).CFrame * CFrame.Angles(0, 0, rad(-20)), Vector3.new(-0.7, -0.85, 1.7), -1)
+	-- mão direita fecha no punho (inclinado 18°), esquerda apoia por baixo do guarda-mão
+	local rightGrip = (attachment(root, "RightGrip") :: Attachment).CFrame * CFrame.Angles(rad(-18), 0, 0) * CFrame.Angles(rad(-90), 0, 0)
+	local leftGrip = (attachment(root, "LeftGrip") :: Attachment).CFrame * CF(0, 0.13, 0)
+	local right = ArmsBuilder.Build(root, "RightArm", rightGrip, Vector3.new(0.5, -0.7, 1.5), 1, 0.12)
+	local left = ArmsBuilder.Build(root, "LeftArm", leftGrip, Vector3.new(-1.3, -0.55, 1.45), -1, 0.19)
 	local charmDef = Config.Cosmetics[ClientState.Equipped("Charm")]
 	local charm = CharmBuilder.Attach(root, built.CharmMount, charmDef and charmDef.Visual)
 
@@ -141,7 +144,7 @@ local function buildKnife(): Rig
 	local model = built.Model
 	model.Name = "ViewmodelKnife"
 	WrapPainter.PaintKnife(model, knifeId)
-	local right = ArmsBuilder.Build(built.Root, "RightArm", CFrame.Angles(rad(-90), 0, 0) * CF(0, 0, 0.05), Vector3.new(0.35, -0.6, 1.5), 1)
+	local right = ArmsBuilder.Build(built.Root, "RightArm", CFrame.Angles(rad(-90), 0, 0) * CF(0, 0, 0.05), Vector3.new(0.35, -0.6, 1.5), 1, 0.09)
 	model:ScaleTo(SCALE * 1.15)
 	for _, part in model:GetDescendants() do
 		if part:IsA("BasePart") then
