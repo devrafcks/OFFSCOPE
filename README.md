@@ -206,16 +206,17 @@ Enquanto isso não roda, o jogo usa sons locais do próprio client (`rbxasset://
 
 ## Monetização (só visual)
 
-| Item | Robux | Moedas |
-|---|---:|---:|
-| Camo lisa | 49 | 2.500 |
-| Camo militar | 99 | 5.000 |
-| Wrap estilizada | 199 | 10.000 |
-| Wrap animada | 349 | 18.000 |
-| Wrap lendária | 499 | 25.000 ou passe |
-| Charms, facas, kill effects | 49 a 299 | 2.500 a 15.000 |
-| Passe Prime da temporada | 449 | faixa grátis forte |
-| Pacote iniciante | 99 | 2 camos + 1 charm |
+| Item | Raridade | Robux | Moedas |
+|---|---|---:|---:|
+| Comum (camo lisa, retículo, tracer, charm simples) | Common | 15 | 500 |
+| Incomum (camo militar, faca, charm) | Uncommon | 29 | 1.000 |
+| Raro (wrap estilizada, kill effect) | Rare | 49 | 1.800 |
+| Épico (wrap animada, faca neon, finisher) | Epic | 79 | 3.000 |
+| Lendário (wrap da temporada) | Legendary | 149 | 5.000 ou passe |
+| Passe Prime | — | 199 | faixa grátis forte |
+| Pacote iniciante | — | 49 | 2 camos Uncommon + 1 charm |
+
+Uma partida rende ~400–600 moedas: um item comum sai em uma partida, um épico em ~6.
 
 Nada muda dano, spread, velocidade, munição ou ELO. A lista completa para criar no Dashboard está em [`docs/produtos.md`](docs/produtos.md).
 

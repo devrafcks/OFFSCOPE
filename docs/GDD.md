@@ -116,19 +116,15 @@ Texturas de camo geradas no repositório (`assets/textures`) — sobem como Imag
 
 | Item | Raridade | Robux | Moedas |
 |---|---|---:|---:|
-| Camo lisa | Common | 49 | 2.500 |
-| Camo militar | Uncommon | 99 | 5.000 |
-| Wrap estilizada | Rare | 199 | 10.000 |
-| Wrap animada / emissive | Epic | 349 | 18.000 |
-| Wrap lendária (temporada) | Legendary | 499 | 25.000 ou passe |
-| Charm simples | Common–Rare | 49–149 | 2.500–8.000 |
-| Charm raro | Epic | 199 | 12.000 |
-| Skin de faca | Uncommon–Epic | 99–299 | 5.000–15.000 |
-| Kill effect | Rare–Epic | 149–299 | 8.000–15.000 |
-| Finisher melee | Epic | 249–399 | 20.000 ou passe |
-| Retículo / tracer | Common–Rare | 49–99 | 3.000 |
-| Passe Prime | — | 449 | faixa grátis forte |
-| Pacote iniciante | — | 99 | 2 camos Uncommon + 1 charm |
+| Comum (camo lisa, retículo, tracer, charm simples) | Common | 15 | 500 |
+| Incomum (camo militar, faca, charm) | Uncommon | 29 | 1.000 |
+| Raro (wrap estilizada, kill effect) | Rare | 49 | 1.800 |
+| Épico (wrap animada, faca neon, finisher) | Epic | 79 | 3.000 |
+| Lendário (wrap da temporada) | Legendary | 149 | 5.000 ou passe |
+| Passe Prime | — | 199 | faixa grátis forte |
+| Pacote iniciante | — | 49 | 2 camos Uncommon + 1 charm |
+
+Uma partida rende ~400–600 moedas: um item comum sai em uma partida, um épico em ~6.
 
 - **Loja diária**: 6 itens sorteados de forma determinística pela data (todos os servidores veem a mesma loja).
 - **Catálogo permanente**: camos Common e Uncommon.
