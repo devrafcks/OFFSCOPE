@@ -1,0 +1,26 @@
+# Pacotes do Wally (instale com `wally install`)
+Packages/
+ServerPackages/
+DevPackages/
+
+# Builds e artefatos gerados
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.rbxl.lock
+sourcemap.json
+.tooling/
+node_modules/
+tools/branding/node_modules/
+
+# Segredos do upload de assets (Open Cloud)
+.env
+*.key
+
+# SO / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
