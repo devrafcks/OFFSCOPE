@@ -5,16 +5,19 @@
 	• Avatares normalizados (escala 1, partes de corpo padrão) → hitbox igual para todos.
 	  Roupas, cores e acessórios continuam; acessórios nunca contam como hit.
 	• Arma do mundo (Lite) presa na mão, com o wrap equipado; faca troca de lugar com a sniper.
-	• Pose de segurar a arma via C0 dos ombros (replica), o tilt de pitch é feito no cliente.
+	• Pose de segurar a arma: atributos BaseC0/HoldC0 nas juntas + HoldPose por frame
+	  (cliente e servidor; Motor6D ou AnimationConstraint do avatar novo).
 ]]
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage.Shared
 local Config = require(Shared.Config)
 local Remotes = require(Shared.Remotes)
 local Signal = require(Shared.Util.Signal)
+local HoldPose = require(Shared.Util.HoldPose)
 local Joint = require(Shared.Util.Joint)
 local SniperBuilder = require(Shared.Models.SniperBuilder)
 local KnifeBuilder = require(Shared.Models.KnifeBuilder)
@@ -332,6 +335,13 @@ function CharacterService.Init()
 		contexts[player] = nil
 		descriptions[player] = nil
 		spawnTokens[player] = nil
+	end)
+	-- mesma pose dos clientes nas AnimationConstraints, para as hitboxes dos braços baterem
+	-- (Motor6D fica com o C0 replicado: nada de escrever C0 60×/s pela rede)
+	RunService.PreSimulation:Connect(function(dt)
+		HoldPose.Step(dt, function()
+			return false
+		end)
 	end)
 end
 
