@@ -15,6 +15,7 @@ local Shared = ReplicatedStorage.Shared
 local Config = require(Shared.Config)
 local Remotes = require(Shared.Remotes)
 local Signal = require(Shared.Util.Signal)
+local Joint = require(Shared.Util.Joint)
 local SniperBuilder = require(Shared.Models.SniperBuilder)
 local KnifeBuilder = require(Shared.Models.KnifeBuilder)
 local ModelKit = require(Shared.Models.ModelKit)
@@ -177,27 +178,26 @@ end
 local function applyHoldPose(character: Model)
 	local rightUpper = character:FindFirstChild("RightUpperArm")
 	local leftUpper = character:FindFirstChild("LeftUpperArm")
-	local right = rightUpper and rightUpper:FindFirstChild("RightShoulder") :: Motor6D?
-	local left = leftUpper and leftUpper:FindFirstChild("LeftShoulder") :: Motor6D?
-	if right then
-		right:SetAttribute("BaseC0", right.C0)
-		right.C0 = right.C0 * CFrame.Angles(0, math.rad(10), 0) * CFrame.Angles(math.rad(88), 0, 0)
-	end
-	if left then
-		left:SetAttribute("BaseC0", left.C0)
-		left.C0 = left.C0 * CFrame.Angles(0, math.rad(-32), 0) * CFrame.Angles(math.rad(84), 0, 0)
-	end
-	-- o cliente aplica o tilt de pitch em cima destes C0 (HoldC0 replica como atributo)
-	for _, motor in { right, left } do
-		if motor then
-			motor:SetAttribute("HoldC0", motor.C0)
+	local right = Joint.Find(rightUpper, "RightShoulder")
+	local left = Joint.Find(leftUpper, "LeftShoulder")
+	-- BaseC0 guarda o original: respawn/reaplicação nunca acumula rotação
+	local function pose(joint: Instance?, offset: CFrame)
+		if not joint then
+			return
 		end
+		local base = (joint:GetAttribute("BaseC0") :: CFrame?) or Joint.GetC0(joint)
+		if not base then
+			return
+		end
+		joint:SetAttribute("BaseC0", base)
+		local hold = base * offset
+		Joint.SetC0(joint, hold)
+		-- o cliente aplica o tilt de pitch em cima deste C0 (HoldC0 replica como atributo)
+		joint:SetAttribute("HoldC0", hold)
 	end
-	local head = character:FindFirstChild("Head")
-	local neck = head and head:FindFirstChild("Neck")
-	if neck and neck:IsA("Motor6D") then
-		neck:SetAttribute("HoldC0", neck.C0)
-	end
+	pose(right, CFrame.Angles(0, math.rad(10), 0) * CFrame.Angles(math.rad(88), 0, 0))
+	pose(left, CFrame.Angles(0, math.rad(-32), 0) * CFrame.Angles(math.rad(84), 0, 0))
+	pose(Joint.Find(character:FindFirstChild("Head"), "Neck"), CFrame.identity)
 end
 
 -- ── spawn ────────────────────────────────────────────────────────────────────

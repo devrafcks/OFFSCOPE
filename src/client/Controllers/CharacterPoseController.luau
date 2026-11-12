@@ -6,7 +6,10 @@
 ]]
 
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+
+local Joint = require(ReplicatedStorage.Shared.Util.Joint)
 
 local CharacterPoseController = {}
 
@@ -39,21 +42,20 @@ local function poseOthers(dt: number)
 		local tilt = CFrame.Angles(math.clamp(value, -1.2, 1.2) * 0.85, 0, 0)
 		for _, name in { "RightUpperArm", "LeftUpperArm" } do
 			local arm = character:FindFirstChild(name)
-			local shoulder = arm and arm:FindFirstChild(if name == "RightUpperArm" then "RightShoulder" else "LeftShoulder") :: Motor6D?
+			local shoulder = Joint.Find(arm, if name == "RightUpperArm" then "RightShoulder" else "LeftShoulder")
 			if shoulder then
 				-- C0 de "segurar a arma" que o servidor replicou como atributo
 				local base = shoulder:GetAttribute("HoldC0") :: CFrame?
 				if base then
-					shoulder.C0 = base * tilt
+					Joint.SetC0(shoulder, base * tilt)
 				end
 			end
 		end
-		local head = character:FindFirstChild("Head")
-		local neck = head and head:FindFirstChild("Neck") :: Motor6D?
+		local neck = Joint.Find(character:FindFirstChild("Head"), "Neck")
 		if neck then
 			local base = neck:GetAttribute("HoldC0") :: CFrame?
 			if base then
-				neck.C0 = base * CFrame.Angles(math.clamp(value, -1, 1) * 0.6, 0, 0)
+				Joint.SetC0(neck, base * CFrame.Angles(math.clamp(value, -1, 1) * 0.6, 0, 0))
 			end
 		end
 	end
