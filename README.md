@@ -224,14 +224,15 @@ Nada muda dano, spread, velocidade, munição ou ELO. A lista completa para cria
 
 ## Status
 
-O código está **completo para as 6 fases do plano** e passa no build, no type-check e no lint. O que falta depende
-de ação humana:
+O código está **completo para as 6 fases do plano**, passa no build, no type-check e no lint, e foi
+**jogado no Studio com 2 clientes**: duelo e ranked até o fim, todos contra todos, 2v2, loja e kill feed.
+O passo a passo de lançamento está em **[docs/lancamento.md](docs/lancamento.md)**.
 
-- [ ] Playtest no Studio com 2+ jogadores e ajuste fino de feel (spread, ADS, recoil) no `Config.luau`
+- [x] Playtest no Studio com 2 jogadores (combate, rounds, ranked/ELO, votação, loja)
 - [ ] Publicar o lobby place e o match place e colar os PlaceIds no Config
-- [ ] Criar os Developer Products e colar os IDs ([lista](docs/produtos.md))
+- [ ] Criar os Developer Products — `node tools/products/create.mjs` ([detalhes](docs/produtos.md))
 - [ ] Rodar o upload dos assets (`tools/assets/upload.mjs`)
-- [ ] Content Ratings no Creator Hub e publicar com o ícone e a thumbnail de `assets/branding`
+- [ ] Questionário de maturidade e página da experiência com o ícone e a thumbnail de `assets/branding`
 
 **Próximos passos:** meshes-herói no Blender com `SurfaceAppearance`, animações gravadas em 3ª pessoa,
 parties para a fila 2v2 e serialização de tiros com ByteNet.
