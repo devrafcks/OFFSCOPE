@@ -1,5 +1,10 @@
 # Lançamento — passo a passo
 
+> **Status (13/11/2026):** publicado e público em
+> [roblox.com/games/133650768159073](https://www.roblox.com/games/133650768159073) — universe `10776286889`.
+> Feito: place publicada (modo servidor único), 34 produtos, sons e texturas, ícone, thumbnails,
+> gênero e questionário (Leve · 16+). Pendente: teste ao vivo com 2 contas (passo 5) e liberar menores de 16.
+
 Tudo que depende da **sua conta** no Roblox, na ordem. Cada passo diz o que fazer e como conferir.
 O código não publica nada sozinho.
 

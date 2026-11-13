@@ -228,11 +228,15 @@ O código está **completo para as 6 fases do plano**, passa no build, no type-c
 **jogado no Studio com 2 clientes**: duelo e ranked até o fim, todos contra todos, 2v2, loja e kill feed.
 O passo a passo de lançamento está em **[docs/lancamento.md](docs/lancamento.md)**.
 
+**🎮 Jogue: [roblox.com/games/133650768159073](https://www.roblox.com/games/133650768159073)**
+
 - [x] Playtest no Studio com 2 jogadores (combate, rounds, ranked/ELO, votação, loja)
-- [ ] Publicar o lobby place e o match place e colar os PlaceIds no Config
-- [ ] Criar os Developer Products — `node tools/products/create.mjs` ([detalhes](docs/produtos.md))
-- [ ] Rodar o upload dos assets (`tools/assets/upload.mjs`)
-- [ ] Questionário de maturidade e página da experiência com o ícone e a thumbnail de `assets/branding`
+- [x] Experiência publicada e pública (universe `10776286889`, servidor de 24, partidas no próprio servidor)
+- [x] 34 Developer Products criados e ligados no `Config.luau`
+- [x] 22 sons e 6 texturas enviados (`AssetIds.luau`)
+- [x] Ícone, 4 thumbnails, gênero e questionário de maturidade (Leve · 16+)
+- [ ] Alcançar menores de 16 anos (2FA na conta + 250 jogadores engajados ou taxa de 1.000 Robux)
+- [ ] Place de partida separada para fila entre servidores (opcional — o código já suporta)
 
 **Próximos passos:** meshes-herói no Blender com `SurfaceAppearance`, animações gravadas em 3ª pessoa,
 parties para a fila 2v2 e serialização de tiros com ByteNet.
