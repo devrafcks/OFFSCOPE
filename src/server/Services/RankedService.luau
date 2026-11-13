@@ -76,6 +76,25 @@ function RankedService.ApplyMatch(teams: { [string]: { Player } }, winner: strin
 	return deltas
 end
 
+-- Abandono no meio de uma ranked conta como derrota (senão sair "salvaria" o ELO de quem está perdendo).
+function RankedService.ApplyAbandon(player: Player, opponents: { Player }): number?
+	local ratings = {}
+	for _, opponent in opponents do
+		table.insert(ratings, eloOf(opponent))
+	end
+	local opponentElo = if #ratings > 0 then Elo.Average(ratings) else Config.Ranked.StartElo
+	local applied: number? = nil
+	Registry.DataService.Update(player, function(data)
+		local delta = Elo.Delta(data.Elo, opponentElo, 0, data.EloMatches)
+		data.Elo = Elo.Apply(data.Elo, delta)
+		data.EloMatches += 1
+		data.Stats.RankedLosses = (data.Stats.RankedLosses or 0) + 1
+		applied = delta
+		task.spawn(RankedService.Submit, player.UserId, data.Elo)
+	end)
+	return applied
+end
+
 function RankedService.Submit(userId: number, elo: number)
 	local s = store()
 	if not s or userId <= 0 then

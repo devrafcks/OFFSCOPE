@@ -274,12 +274,15 @@ function DataService.Start()
 	end
 	Players.PlayerAdded:Connect(onPlayerAdded)
 	Players.PlayerRemoving:Connect(function(player)
-		local profile = profiles[player]
-		profiles[player] = nil
-		dirty[player] = nil
-		if profile then
-			profile:EndSession()
-		end
+		-- adiado um passo: outros handlers de saída (ex.: abandono de ranked) ainda gravam no perfil
+		task.defer(function()
+			local profile = profiles[player]
+			profiles[player] = nil
+			dirty[player] = nil
+			if profile then
+				profile:EndSession()
+			end
+		end)
 	end)
 end
 

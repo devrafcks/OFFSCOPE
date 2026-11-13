@@ -103,12 +103,30 @@ function RoundService.StartMatch(modeId: string, players: { Player }, mapId: str
 end
 
 -- Jogador pediu para sair da partida (botão "Voltar ao lobby").
+-- sair de uma ranked em andamento = derrota de ELO
+local function penalizeAbandon(match, player: Player)
+	if not match.Mode.Ranked or match.State == "MatchEnd" or match.State == "Vote" then
+		return
+	end
+	local team = player:GetAttribute("Team")
+	local opponents = {}
+	for name, list in match.Teams do
+		if name ~= team then
+			for _, other in list do
+				table.insert(opponents, other)
+			end
+		end
+	end
+	Registry.RankedService.ApplyAbandon(player, opponents)
+end
+
 function RoundService.Leave(player: Player)
 	local match = playerMatch[player]
 	if not match then
 		return
 	end
 	playerMatch[player] = nil
+	penalizeAbandon(match, player)
 	match:RemovePlayer(player)
 	Remotes.Event("MatchState"):FireClient(player, nil)
 	returnToLobby({ player })
@@ -182,6 +200,7 @@ function RoundService.Init()
 		local match = playerMatch[player]
 		playerMatch[player] = nil
 		if match then
+			penalizeAbandon(match, player)
 			match:RemovePlayer(player)
 		end
 	end)
