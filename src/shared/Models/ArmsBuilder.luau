@@ -1,13 +1,3 @@
---[[
-	ArmsBuilder — braços da viewmodel (luva tática + manga).
-	Cada braço é uma sub-montagem com um "Wrist" invisível ligado por Motor6D à Root da arma:
-	animar o Transform do motor move mão + antebraço juntos (ferrolho, reload, faca).
-
-	Espaço da mão (gripCFrame): a peça segurada corre ao longo do Z local, centrada na origem;
-	a palma fica do lado −Y e os dedos dão a volta pelo lado X = side·raio, o polegar pelo outro.
-	Tudo em SmoothPlastic: Fabric/Leather viram "granulado" na escala da viewmodel.
-]]
-
 local ModelKit = require(script.Parent.ModelKit)
 
 local ArmsBuilder = {}
@@ -18,7 +8,6 @@ local rad = math.rad
 
 export type Arm = { Model: Model, Wrist: BasePart, Motor: Motor6D }
 
--- luva coyote contrasta com a arma escura; manga oliva separa luva de manga
 local SLEEVE = Color3.fromRGB(88, 96, 74)
 local SLEEVE_DARK = Color3.fromRGB(68, 75, 57)
 local SEAM = Color3.fromRGB(56, 62, 46)
@@ -34,7 +23,7 @@ local function cylinderBetween(model: Model, name: string, a: Vector3, b: Vector
 		Name = name,
 		Shape = Enum.PartType.Cylinder,
 		Size = V(length, diameter, diameter),
-		-- o eixo do Cylinder é o X local: gira 90° para alinhar com a direção a→b
+
 		CFrame = CFrame.lookAt((a + b) / 2, b) * CFrame.Angles(0, rad(90), 0),
 		Color = color,
 	})
@@ -50,12 +39,6 @@ local function ball(model: Model, name: string, position: Vector3, diameter: num
 	})
 end
 
---[[
-	gripCFrame: centro da peça segurada (espaço da Root), com a peça ao longo do Z local.
-	elbowOffset: deslocamento do cotovelo em relação à mão (espaço da Root, +Z = para trás).
-	side: 1 direita, −1 esquerda (espelha dedos/polegar; relógio no braço esquerdo).
-	barRadius: meio-diâmetro da peça segurada (guarda-mão, punho, cabo da faca).
-]]
 function ArmsBuilder.Build(root: BasePart, name: string, gripCFrame: CFrame, elbowOffset: Vector3, side: number, barRadius: number?, skin: Color3?): Arm
 	local model = Instance.new("Model")
 	model.Name = name
@@ -68,13 +51,10 @@ function ArmsBuilder.Build(root: BasePart, name: string, gripCFrame: CFrame, elb
 		return hand * CF(x, y, z)
 	end
 
-	-- palma por baixo da peça + faixa de velcro no dorso
-	-- (proporção real: a mão tem ~1/6 do comprimento do fuzil)
 	ModelKit.Part(model, { Name = "Palm", Size = V(0.36, 0.17, 0.56), CFrame = at(0, -(r + 0.085), 0.02), Color = GLOVE })
 	ModelKit.Part(model, { Name = "PalmPad", Size = V(0.28, 0.035, 0.42), CFrame = at(0, -(r + 0.18), 0.03), Color = GLOVE_PAD })
 	ModelKit.Part(model, { Name = "Strap", Size = V(0.38, 0.06, 0.1), CFrame = at(0, -(r + 0.095), 0.27), Color = STRAP })
 
-	-- quatro dedos lado a lado ao longo da peça, subindo pela lateral
 	local fx = side * (r + 0.04)
 	for i, z in { -0.2, -0.07, 0.06, 0.19 } do
 		local reach = if i == 1 then 1 elseif i == 4 then 0.8 else 1.05
@@ -89,7 +69,6 @@ function ArmsBuilder.Build(root: BasePart, name: string, gripCFrame: CFrame, elb
 		ball(model, "Knuckle" .. i, (at(side * (r + 0.05), -(r + 0.06), z)).Position, 0.13, GLOVE_PAD)
 	end
 
-	-- polegar pelo outro lado, deitado ao longo da peça
 	local tx = -side * (r + 0.05)
 	ModelKit.Part(model, {
 		Name = "Thumb",
@@ -100,14 +79,12 @@ function ArmsBuilder.Build(root: BasePart, name: string, gripCFrame: CFrame, elb
 	ball(model, "ThumbTip", (at(tx, -r * 0.1, -0.21)).Position, 0.12, GLOVE)
 	ball(model, "ThumbBase", (at(tx * 0.85, -(r + 0.06), 0.14)).Position, 0.2, GLOVE)
 
-	-- antebraço: do pulso até o cotovelo, afinando no pulso
 	local palmCenter = at(0, -(r + 0.09), 0.1).Position
 	local elbow = (root.CFrame * CF(gripCFrame.Position + elbowOffset)).Position
 	local axis = (elbow - palmCenter).Unit
 	local wristPos = palmCenter + axis * 0.26
 	local forearmLength = (elbow - wristPos).Magnitude
 
-	-- luva → pulso com pele → manga dobrada → manga até o cotovelo
 	local skinColor = skin or DEFAULT_SKIN
 	local roll = wristPos + axis * (forearmLength * 0.42)
 	cylinderBetween(model, "GloveCuff", palmCenter + axis * 0.12, wristPos + axis * 0.08, 0.33, GLOVE)
@@ -119,7 +96,6 @@ function ArmsBuilder.Build(root: BasePart, name: string, gripCFrame: CFrame, elb
 	ball(model, "Elbow", elbow, 0.42, SLEEVE)
 	local mid = roll + (elbow - roll) * 0.5
 
-	-- costura e bolso da manga: quebram a silhueta sem textura
 	local up = hand.UpVector
 	local seamOffset = (up - axis * up:Dot(axis)).Unit
 	cylinderBetween(model, "Seam", roll + axis * 0.14 + seamOffset * 0.195, elbow + seamOffset * 0.2, 0.03, SEAM)
@@ -131,7 +107,6 @@ function ArmsBuilder.Build(root: BasePart, name: string, gripCFrame: CFrame, elb
 		Color = SLEEVE_DARK,
 	})
 
-	-- relógio no pulso esquerdo
 	if side < 0 then
 		cylinderBetween(model, "WatchBand", wristPos + axis * 0.1, wristPos + axis * 0.17, 0.31, STRAP)
 		ModelKit.Part(model, {
@@ -143,7 +118,6 @@ function ArmsBuilder.Build(root: BasePart, name: string, gripCFrame: CFrame, elb
 		})
 	end
 
-	-- manga continua para fora da câmera
 	cylinderBetween(model, "Sleeve", elbow - axis * 0.05, elbow + axis * 3, 0.45, SLEEVE)
 
 	ModelKit.WeldAll(model, wrist)

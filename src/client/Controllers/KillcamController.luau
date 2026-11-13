@@ -1,10 +1,3 @@
---[[
-	KillcamController — 3 s na "visão" de quem te matou.
-	MVP honesto: a câmera vai para a cabeça do killer (posição ao vivo), olhando para onde você
-	caiu, com o tracer do tiro reprisado, DoF leve (o único lugar onde DoF liga) e um cartão
-	com nome, arma, distância e tags de estilo.
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -118,7 +111,6 @@ local function play(data)
 		dof.Enabled = true
 	end
 
-	-- um instante na própria morte, depois corta para o killer
 	local start = os.clock()
 	local replayed = false
 	local connection
@@ -134,7 +126,7 @@ local function play(data)
 			headPos = head.Position
 		end
 		if t < 0.6 then
-			-- câmera "cai" e olha para o atirador
+
 			local from = victimPos + Vector3.new(0, 2.5 - t * 1.5, 0)
 			camera.CFrame = camera.CFrame:Lerp(CFrame.lookAt(from, headPos), 0.15)
 			camera.FieldOfView += (60 - camera.FieldOfView) * 0.1

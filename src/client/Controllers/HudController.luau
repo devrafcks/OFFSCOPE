@@ -1,10 +1,3 @@
---[[
-	HudController — HUD de combate.
-	Retículo (ponto + anel que mostra o spread REAL), hitmarker, números de dano, munição com
-	pips e barra do ferrolho, vida, indicador de direção do dano, kill feed, toasts de estilo
-	e o overlay da luneta. Tudo em pt-BR, tudo leve (sem imagens externas).
-]]
-
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -37,7 +30,6 @@ local hitmarkerHead = false
 local fpsFrames = 0
 local fpsClock = 0
 
--- ── construção ─────────────────────────────────────────────────────────────
 local function buildCrosshair(parent: Instance)
 	local root = New("Frame", {
 		Name = "Crosshair",
@@ -68,7 +60,7 @@ local function buildCrosshair(parent: Instance)
 		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
 		New("UIStroke", { Name = "Stroke", Color = Color3.new(1, 1, 1), Thickness = 1.2, Transparency = 0.45 }),
 	})
-	-- forma "cruz" (cosmético)
+
 	local cross = New("Frame", { Name = "Cross", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Visible = false, Parent = root })
 	for i, spec in { { 0, -1 }, { 0, 1 }, { -1, 0 }, { 1, 0 } } do
 		New("Frame", {
@@ -81,7 +73,7 @@ local function buildCrosshair(parent: Instance)
 			Parent = cross,
 		})
 	end
-	-- hitmarker: 4 traços diagonais
+
 	local hit = New("Frame", { Name = "Hitmarker", AnchorPoint = Vector2.new(0.5, 0.5), Position = UDim2.fromScale(0.5, 0.5), Size = UDim2.fromOffset(44, 44), BackgroundTransparency = 1, Parent = root })
 	for i, angle in { 45, 135, 225, 315 } do
 		local r = math.rad(angle)
@@ -118,10 +110,10 @@ local function buildScope(parent: Instance)
 		ZIndex = 5,
 		Parent = scope,
 		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
-		-- o "truque" do traço gigante: tudo fora do círculo fica preto
+
 		New("UIStroke", { Name = "Mask", Color = Color3.fromRGB(4, 4, 6), Thickness = 2400, Transparency = 0 }),
 	})
-	-- sombra interna da borda
+
 	New("Frame", {
 		AnchorPoint = Vector2.new(0.5, 0.5),
 		Position = UDim2.fromScale(0.5, 0.5),
@@ -132,7 +124,7 @@ local function buildScope(parent: Instance)
 		New("UICorner", { CornerRadius = UDim.new(1, 0) }),
 		New("UIStroke", { Color = Color3.fromRGB(0, 0, 0), Thickness = 26, Transparency = 0.35 }),
 	})
-	-- retículo da luneta: linhas finas + mil-dots + postes grossos nas bordas
+
 	local function line(size: UDim2, position: UDim2)
 		New("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Position = position, Size = size, BackgroundColor3 = Color3.fromRGB(10, 10, 10), BorderSizePixel = 0, ZIndex = 6, Parent = lens })
 	end
@@ -262,7 +254,6 @@ local function buildHealth(parent: Instance)
 	refs.HealthLag = New("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = C.Bad, BorderSizePixel = 0, Parent = back, New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 	refs.HealthBar = New("Frame", { Size = UDim2.fromScale(1, 1), BackgroundColor3 = C.Text, BorderSizePixel = 0, Parent = back, New("UICorner", { CornerRadius = UDim.new(1, 0) }) })
 
-	-- vinheta de vida baixa (gradiente nas bordas)
 	local vignette = New("Frame", { Name = "Vignette", Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Parent = parent })
 	for i, rotation in { 0, 90, 180, 270 } do
 		local horizontal = rotation % 180 == 0
@@ -306,7 +297,6 @@ local function buildFeed(parent: Instance)
 	refs.Fps = Theme.Label({ Text = "", FontFace = Theme.Fonts.Mono, TextSize = 12, TextColor3 = C.TextDim, Position = UDim2.fromOffset(12, 8), Size = UDim2.fromOffset(120, 14), Parent = parent })
 end
 
--- ── API usada pelo WeaponController ────────────────────────────────────────
 function HudController.SetSlot(slot: string)
 	weapon.Slot = slot
 	if refs.WeaponName then
@@ -382,7 +372,6 @@ local function chip(parent: Instance, text: string, color: Color3, order: number
 	return label
 end
 
--- payload: { Kind, Text?, Tags?, Coins?, Distance? }
 function HudController.Toast(payload)
 	if not refs.Toasts then
 		return
@@ -440,7 +429,7 @@ function HudController.Toast(payload)
 		end
 		Debris:AddItem(row, 0.35)
 	end)
-	-- no máximo 4 toasts
+
 	local rows = {}
 	for _, child in refs.Toasts:GetChildren() do
 		if child:IsA("Frame") then
@@ -548,7 +537,6 @@ local function damageIndicator(fromPosition: Vector3)
 	Debris:AddItem(holder, 1.3)
 end
 
--- ── loop ───────────────────────────────────────────────────────────────────
 local healthLag = 1
 
 local function update(dt: number)
@@ -562,7 +550,6 @@ local function update(dt: number)
 		refs.ScopeMask.Thickness = math.max(camera.ViewportSize.X, camera.ViewportSize.Y)
 	end
 
-	-- retículo: o anel mostra o cone real do tiro agora
 	local reticle = Config.Cosmetics[ClientState.Equipped("Reticle")]
 	local color = reticle and reticle.Visual.Color or Color3.new(1, 1, 1)
 	local isCross = reticle ~= nil and reticle.Visual.Shape == "Cross"
@@ -581,7 +568,6 @@ local function update(dt: number)
 	refs.Ring.Stroke.Transparency = 0.45 + (1 - fade) * 0.55
 	refs.Dot.BackgroundTransparency = if weapon.Slot == "Knife" then 0.2 else 0
 
-	-- hitmarker
 	local since = os.clock() - hitmarkerTime
 	local hitAlpha = math.clamp(since / (if hitmarkerKill then 0.45 else 0.25), 0, 1)
 	local tickColor = if hitmarkerKill then Color3.fromRGB(255, 70, 70) elseif hitmarkerHead then Color3.fromRGB(255, 200, 70) else Color3.new(1, 1, 1)
@@ -592,7 +578,6 @@ local function update(dt: number)
 		end
 	end
 
-	-- munição
 	local isKnife = weapon.Slot == "Knife"
 	refs.Ammo.Text = if isKnife then "—" else tostring(weapon.Mag)
 	refs.Reserve.Text = if isKnife then "" elseif Config.Sniper.InfiniteReserve then "/ ∞" else `/ {weapon.Reserve}`
@@ -614,7 +599,6 @@ local function update(dt: number)
 		refs.Status.Text = if not isKnife and weapon.Mag == 0 then "SEM MUNIÇÃO · R" else ""
 	end
 
-	-- vida
 	local health = if humanoid then math.max(0, humanoid.Health) else 0
 	local maxHealth = if humanoid then humanoid.MaxHealth else 100
 	local ratio = health / math.max(maxHealth, 1)
@@ -626,7 +610,7 @@ local function update(dt: number)
 		healthLag = ratio
 	end
 	refs.HealthLag.Size = UDim2.fromScale(healthLag, 1)
-	-- só pulsa com vida baixa e viva: morto/na votação a borda vermelha some
+
 	local danger = if inCombat and health > 0 then math.clamp((0.45 - ratio) / 0.45, 0, 1) * (0.75 + math.sin(os.clock() * 5) * 0.25) else 0
 	for _, edge in refs.Vignette:GetChildren() do
 		(edge :: Frame).BackgroundTransparency = 1 - danger * 0.8
@@ -634,7 +618,6 @@ local function update(dt: number)
 	refs.Health.Visible = inCombat
 	refs.Weapon.Visible = inCombat
 
-	-- fps
 	fpsFrames += 1
 	if os.clock() - fpsClock >= 0.5 then
 		refs.Fps.Text = if ClientState.Settings.ShowFps then `{math.floor(fpsFrames / (os.clock() - fpsClock))} FPS` else ""

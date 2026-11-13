@@ -1,5 +1,4 @@
 --!strict
--- Interseção raio × OBB (slab method) e mapeamento de parte → zona de dano.
 
 local Hitbox = {}
 
@@ -8,11 +7,10 @@ export type Zone = "Head" | "Chest" | "Stomach" | "Limb"
 local ZONES: { [string]: Zone } = {
 	Head = "Head",
 	UpperTorso = "Chest",
-	Torso = "Chest", -- R6
+	Torso = "Chest",
 	LowerTorso = "Stomach",
 }
 
--- Partes que entram no histórico de hitbox (R15 + R6). Acessórios nunca contam.
 Hitbox.TrackedParts = {
 	"Head",
 	"UpperTorso",
@@ -36,17 +34,12 @@ Hitbox.TrackedParts = {
 	"Right Leg",
 }
 
--- Prioridade quando dois OBBs empatam na distância (cabeça ganha).
 Hitbox.ZonePriority = { Head = 4, Chest = 3, Stomach = 2, Limb = 1 } :: { [string]: number }
 
 function Hitbox.ZoneOf(partName: string): Zone
 	return ZONES[partName] or "Limb"
 end
 
---[[
-	Retorna a distância `t` ao longo do raio até entrar no OBB, ou nil.
-	`direction` deve ser unitário. `padding` aumenta o OBB em todas as faces (lag/feel).
-]]
 function Hitbox.RayOBB(origin: Vector3, direction: Vector3, cframe: CFrame, size: Vector3, padding: number?): number?
 	local half = size * 0.5 + Vector3.one * (padding or 0)
 	local o = cframe:PointToObjectSpace(origin)
@@ -85,7 +78,6 @@ function Hitbox.RayOBB(origin: Vector3, direction: Vector3, cframe: CFrame, size
 	return math.max(tMin, 0)
 end
 
--- Distância de um ponto até o OBB (0 se dentro). Usada na faca.
 function Hitbox.PointOBBDistance(point: Vector3, cframe: CFrame, size: Vector3): number
 	local p = cframe:PointToObjectSpace(point)
 	local half = size * 0.5

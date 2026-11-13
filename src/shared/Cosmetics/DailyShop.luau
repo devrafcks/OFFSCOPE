@@ -1,8 +1,4 @@
 --!strict
---[[
-	Loja diária determinística: a semente é o dia UTC, então todos os servidores (e o cliente)
-	calculam a MESMA vitrine sem DataStore. Vira à meia-noite UTC.
-]]
 
 local Config = require(script.Parent.Parent.Config)
 local Catalog = require(script.Parent.Catalog)
@@ -18,13 +14,11 @@ function DailyShop.SecondsUntilReset(now: number?): number
 	return 86400 - (t % 86400)
 end
 
--- Garante variedade: no máximo 2 itens por categoria e pelo menos 1 Épico+ quando possível.
 function DailyShop.Items(day: number?): { string }
 	local d = day or DailyShop.Day()
 	local rng = Random.new(d * 7919 + Config.DailyShop.Salt)
 	local pool = Catalog.ByPool("daily")
 
-	-- embaralha (Fisher–Yates)
 	for i = #pool, 2, -1 do
 		local j = rng:NextInteger(1, i)
 		pool[i], pool[j] = pool[j], pool[i]

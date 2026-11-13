@@ -1,42 +1,27 @@
---[[
-	OFFSCOPE — Config
-	ÚNICO lugar de números de gameplay, economia, rede, strings de produto e IDs.
-	IDs reais ficam 0 até o dono colar os valores do Dashboard (ver docs/produtos.md).
-
-	Dica de playtest: mude um número aqui e dê Play — nada mais precisa mudar.
-]]
-
 local Config = {}
 
--- ─────────────────────────────────────────────────────────────── identidade
 Config.Game = {
 	Name = "OFFSCOPE",
 	Tagline = "Uma bala. Sem mira. Só reflexo.",
 	Version = "0.9.0",
 }
 
--- ─────────────────────────────────────────────────────────────── places
--- 0 = não publicado. Com Match = 0 o jogo roda tudo "in-place" (lobby + partida no mesmo servidor).
--- Experiência publicada: universe 10776286889. Match = 0 → partidas rodam no próprio servidor
--- do lobby (modo testado com 2 jogadores). Para fila entre servidores, publique uma place de
--- partida na mesma experiência e coloque o ID dela aqui.
 Config.Places = {
 	Lobby = 133650768159073,
 	Match = 0,
 }
 
 Config.Studio = {
-	-- No Studio, compras com ProductId 0 são simuladas (concede o item sem cobrar).
+
 	SimulateRobuxPurchases = true,
-	-- Moedas extras para testar a loja no Studio.
+
 	BonusCoins = 50000,
-	-- Mínimo de jogadores para começar uma partida no Studio (1 = testar sozinho contra ninguém).
+
 	MinPlayersOverride = nil :: number?,
-	-- Loga cada tiro no Output do servidor (parte, zona, rewind, desvio do spread). Só no Studio.
+
 	DebugHits = false,
 }
 
--- ─────────────────────────────────────────────────────────────── dados
 Config.Data = {
 	ProfileStoreName = "Offscope_Player_v1",
 	KeyPrefix = "Player_",
@@ -47,14 +32,13 @@ Config.Data = {
 	LeaderboardSize = 10,
 }
 
--- ─────────────────────────────────────────────────────────────── jogador
 Config.Player = {
 	MaxHealth = 100,
-	RegenDelay = 6, -- s sem tomar dano para regenerar (só modos com respawn)
+	RegenDelay = 6,
 	RegenPerSecond = 18,
-	SpawnProtection = 1.25, -- s imune após nascer (respawn)
-	RespawnDelay = 3.2, -- inclui a killcam
-	NormalizeAvatars = true, -- escala padrão para hitboxes justas
+	SpawnProtection = 1.25,
+	RespawnDelay = 3.2,
+	NormalizeAvatars = true,
 }
 
 Config.Movement = {
@@ -76,9 +60,9 @@ Config.Movement = {
 Config.Camera = {
 	HipFov = 95,
 	ScopeFov = 30,
-	DefaultSensitivity = 0.0032, -- rad por pixel de mouse
-	DefaultAdsSensitivity = 0.55, -- multiplicador relativo ao FOV
-	GamepadSpeed = 4.2, -- rad/s no stick cheio
+	DefaultSensitivity = 0.0032,
+	DefaultAdsSensitivity = 0.55,
+	GamepadSpeed = 4.2,
 	TouchSensitivity = 0.0055,
 	PitchLimit = 88,
 	SprintFovBonus = 6,
@@ -86,7 +70,6 @@ Config.Camera = {
 	LandingDip = 0.35,
 }
 
--- ─────────────────────────────────────────────────────────────── armas
 Config.Sniper = {
 	Id = "Sniper",
 	DisplayName = "Vanta-7",
@@ -111,34 +94,33 @@ Config.Sniper = {
 		HeadIgnoresFalloff = true,
 	},
 
-	-- Spread em graus (raio do cone). Multiplicadores por estado.
 	Spread = {
 		Base = 0.25,
 		Walk = 1.6,
 		Sprint = 3.0,
 		Slide = 2.4,
 		Air = 7.0,
-		WalkSpeedThreshold = 3, -- studs/s para contar como andando
+		WalkSpeedThreshold = 3,
 		AdsSpread = 0.015,
-		QuickscopeStart = 0.55, -- alpha de ADS a partir do qual o spread começa a cair
+		QuickscopeStart = 0.55,
 	},
 
 	Ads = {
 		Time = 0.34,
 		Settle = 0.09,
 		OutTime = 0.16,
-		GlintAlpha = 0.6, -- a partir daqui os outros veem o brilho da luneta
+		GlintAlpha = 0.6,
 		AutoUnscopeOnShot = true,
 	},
 
 	Recoil = {
-		Pitch = 3.4, -- graus de kick na câmera
+		Pitch = 3.4,
 		Yaw = 0.7,
-		Recovery = 9, -- velocidade de volta
+		Recovery = 9,
 		ViewmodelKick = 0.32,
 	},
 
-	TracerSpeed = 2200, -- só visual
+	TracerSpeed = 2200,
 }
 
 Config.Knife = {
@@ -148,14 +130,13 @@ Config.Knife = {
 	ConeDegrees = 50,
 	BackDamage = 100,
 	FrontDamage = 55,
-	BackstabDot = 0.35, -- dot(look da vítima, direção atacante→vítima) acima disso = costas
+	BackstabDot = 0.35,
 	SwingTime = 0.48,
 	QuickMeleeTime = 0.62,
 	EquipTime = 0.22,
-	HitDelay = 0.09, -- tempo do golpe até o hit (aplicado no cliente antes de mandar)
+	HitDelay = 0.09,
 }
 
--- ─────────────────────────────────────────────────────────────── estilo / recompensas
 Config.Style = {
 	NoScopeMaxAds = 0.15,
 	QuickscopeMaxScopeTime = 0.45,
@@ -177,11 +158,11 @@ Config.Rewards = {
 	RoundWin = 10,
 	MatchWin = 150,
 	MatchLoss = 50,
-	-- XP de conta / passe
+
 	XpPerKill = 60,
 	XpPerMatch = 200,
 	XpWinBonus = 150,
-	RangeKillCoins = 0, -- dummies não dão moedas (anti-farm)
+	RangeKillCoins = 0,
 }
 
 Config.Levels = {
@@ -190,12 +171,11 @@ Config.Levels = {
 	MaxLevel = 200,
 }
 
--- ─────────────────────────────────────────────────────────────── modos
 export type ModeDef = {
 	Id: string,
 	DisplayName: string,
 	Description: string,
-	TeamSize: number, -- 0 = FFA
+	TeamSize: number,
 	Players: number,
 	RoundBased: boolean,
 	ScoreToWin: number,
@@ -282,26 +262,25 @@ Config.Modes = {
 Config.ModeOrder = { "Duel", "RankedDuel", "Duos", "RankedDuos", "Squads", "FFA" }
 
 Config.Match = {
-	WarmupTime = 6, -- contagem antes do 1º round
-	RoundFreezeTime = 3, -- congelado no spawn
+	WarmupTime = 6,
+	RoundFreezeTime = 3,
 	RoundEndTime = 3.5,
 	MatchEndTime = 8,
 	VoteTime = 20,
-	VoteOptions = 2, -- + "Aleatório"
-	ContinueAfterVote = true, -- false = sempre volta ao lobby
+	VoteOptions = 2,
+	ContinueAfterVote = true,
 	MinPlayersToContinue = 2,
-	AbandonGrace = 25, -- s esperando reconectar antes de dar W.O.
+	AbandonGrace = 25,
 }
 
--- ─────────────────────────────────────────────────────────────── ranked
 Config.Ranked = {
 	SeasonId = 1,
 	SeasonName = "Temporada 1 — Maré Baixa",
 	StartElo = 1000,
-	KFactorNew = 40, -- primeiras partidas
+	KFactorNew = 40,
 	KFactor = 24,
 	NewPlayerMatches = 10,
-	SoftResetWeight = 0.5, -- novoElo = StartElo + (elo − StartElo) × peso
+	SoftResetWeight = 0.5,
 	MinElo = 100,
 	Tiers = {
 		{ Name = "Recruta", MinElo = 0, Color = Color3.fromRGB(150, 128, 112) },
@@ -313,7 +292,6 @@ Config.Ranked = {
 	},
 }
 
--- ─────────────────────────────────────────────────────────────── mapas
 export type MapDef = {
 	Id: string,
 	DisplayName: string,
@@ -323,7 +301,7 @@ export type MapDef = {
 }
 
 Config.Maps = {
-	SlotSpacing = 6000, -- distância entre arenas in-place
+	SlotSpacing = 6000,
 	MaxConcurrentInPlace = 2,
 	Order = { "Cais09", "Avenida11", "Posto47" },
 	List = {
@@ -349,10 +327,9 @@ Config.Maps = {
 			Preset = "Posto47",
 		},
 	} :: { [string]: MapDef },
-	KillPlaneDepth = -60, -- relativo à origem do slot
+	KillPlaneDepth = -60,
 }
 
--- ─────────────────────────────────────────────────────────────── rede
 Config.Netcode = {
 	HistoryHz = 30,
 	HistorySeconds = 1.0,
@@ -362,9 +339,9 @@ Config.Netcode = {
 	MaxOriginDistance = 10,
 	LookSendHz = 12,
 	BoltTolerance = 0.12,
-	SpreadTolerance = 0.55, -- spread declarado pode ser até 55% do estimado no servidor
-	AimConeDegrees = 30, -- direção do tiro vs. olhar replicado (só log)
-	RemoteBudgets = { -- token bucket: { capacidade, recarga por segundo }
+	SpreadTolerance = 0.55,
+	AimConeDegrees = 30,
+	RemoteBudgets = {
 		Fire = { 4, 2 },
 		Melee = { 4, 3 },
 		Look = { 30, 20 },
@@ -377,7 +354,7 @@ Config.AntiCheat = {
 	SpeedSampleInterval = 0.5,
 	SpeedTolerance = 1.35,
 	SuspicionLogThreshold = 10,
-	KickThreshold = math.huge, -- sem kick automático no MVP (só log)
+	KickThreshold = math.huge,
 	HeadshotRatioSample = 40,
 	HeadshotRatioSuspicious = 0.9,
 	SnapDegreesSuspicious = 160,
@@ -391,10 +368,9 @@ Config.Matchmaking = {
 	PollInterval = 2,
 	TeleportRetries = 3,
 	TeleportRetryDelay = 2,
-	LocalStartDelay = 3, -- s com a fila cheia antes de iniciar in-place
+	LocalStartDelay = 3,
 }
 
--- ─────────────────────────────────────────────────────────────── cosméticos
 export type Rarity = "Common" | "Uncommon" | "Rare" | "Epic" | "Legendary"
 
 Config.Rarities = {
@@ -422,15 +398,14 @@ export type CosmeticDef = {
 	PriceRobux: number?,
 	PriceCoins: number?,
 	ProductId: number,
-	Pool: string, -- "default" | "catalog" | "daily" | "pass" | "bundle"
+	Pool: string,
 	Visual: { [string]: any },
 }
 
 local C = Color3.fromRGB
 
--- Grupos de peça da arma: Body, Barrel, Stock, Scope, Mag, Accent
 Config.Cosmetics = {
-	-- ── wraps ─────────────────────────────────────────────
+
 	wrap_factory = {
 		Name = "Fábrica",
 		Category = "Wrap",
@@ -690,7 +665,7 @@ Config.Cosmetics = {
 			Scope = { C(30, 34, 40), "Metal" },
 			Mag = { C(150, 220, 255), "ForceField" },
 			Accent = { C(200, 240, 255), "Neon" },
-			Underlay = C(22, 30, 44), -- peça sólida por baixo do ForceField
+			Underlay = C(22, 30, 44),
 		},
 	},
 	wrap_aurora = {
@@ -717,7 +692,6 @@ Config.Cosmetics = {
 		},
 	},
 
-	-- ── charms ────────────────────────────────────────────
 	charm_none = {
 		Name = "Sem charm",
 		Category = "Charm",
@@ -767,7 +741,6 @@ Config.Cosmetics = {
 		Visual = { Kind = "NeonCube", Color = C(255, 60, 160) },
 	},
 
-	-- ── facas ─────────────────────────────────────────────
 	knife_padrao = {
 		Name = "Faca de Campanha",
 		Category = "Knife",
@@ -817,7 +790,6 @@ Config.Cosmetics = {
 		},
 	},
 
-	-- ── kill effects ──────────────────────────────────────
 	fx_none = {
 		Name = "Padrão",
 		Category = "KillEffect",
@@ -867,7 +839,6 @@ Config.Cosmetics = {
 		Visual = { Kind = "Glitch", Color = C(0, 255, 200), Color2 = C(255, 0, 140) },
 	},
 
-	-- ── finalizações (kills de faca) ─────────────────────
 	finisher_none = {
 		Name = "Padrão",
 		Category = "Finisher",
@@ -887,7 +858,6 @@ Config.Cosmetics = {
 		Visual = { Kind = "Crescent", Color = C(200, 220, 255) },
 	},
 
-	-- ── retículos ─────────────────────────────────────────
 	ret_padrao = {
 		Name = "Ponto Branco",
 		Category = "Reticle",
@@ -927,7 +897,6 @@ Config.Cosmetics = {
 		Visual = { Color = C(120, 255, 140), Shape = "Cross" },
 	},
 
-	-- ── tracers ───────────────────────────────────────────
 	tracer_padrao = {
 		Name = "Padrão",
 		Category = "Tracer",
@@ -971,10 +940,9 @@ Config.DefaultEquipped = {
 Config.DailyShop = {
 	Slots = 6,
 	Salt = 4747,
-	-- A loja vira à meia-noite UTC.
+
 }
 
--- ─────────────────────────────────────────────────────────────── passe
 Config.Pass = {
 	Season = 1,
 	Name = "Passe — Temporada 1",
@@ -983,7 +951,7 @@ Config.Pass = {
 	PrimeName = "Passe Prime — Temporada 1",
 	PrimePriceRobux = 199,
 	PrimeProductId = 3730799902,
-	-- Recompensas FIXAS por tier. Tiers sem item na faixa grátis dão moedas.
+
 	FreeCoinsPerTier = 300,
 	Free = {
 		[5] = "wrap_oliva",
@@ -1015,7 +983,6 @@ Config.StarterPack = {
 	BonusCoins = 0,
 }
 
--- ─────────────────────────────────────────────────────────────── desafios diários
 Config.DailyChallenges = {
 	Count = 3,
 	Pool = {
@@ -1029,9 +996,6 @@ Config.DailyChallenges = {
 	},
 }
 
--- ─────────────────────────────────────────────────────────────── áudio
--- Chaves → ids. Vazio = usa o fallback local (rbxasset) ou fica mudo.
--- `tools/assets/upload.mjs` sobe os .wav de assets/audio e gera src/shared/AssetIds.luau.
 Config.Audio = {
 	SniperShot = { Volume = 0.9, Fallback = "rbxasset://sounds/impact_explosion_03.mp3", FallbackPitch = 2.1 },
 	SniperShotDistant = { Volume = 0.55, Fallback = "rbxasset://sounds/impact_explosion_03.mp3", FallbackPitch = 1.7 },
@@ -1058,7 +1022,6 @@ Config.Audio = {
 	Footstep = { Volume = 0.4, Fallback = "rbxasset://sounds/action_footsteps_plastic.mp3", FallbackPitch = 1 },
 }
 
--- ─────────────────────────────────────────────────────────────── UI
 Config.UI = {
 	KillFeedMax = 5,
 	KillFeedLifetime = 6,

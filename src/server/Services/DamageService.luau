@@ -1,11 +1,3 @@
---[[
-	DamageService — o único lugar que tira vida.
-
-	Recebe resultados já validados (HitscanService / MeleeService), checa se o alvo pode tomar dano
-	(mesma partida, time inimigo, sem proteção de spawn), aplica, avisa a vítima, e em caso de kill
-	classifica o estilo (ShotStyle) e dispara `Killed` para quem se interessa (Match, Progression).
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -25,7 +17,7 @@ export type DamageInfo = {
 	Attacker: Player,
 	Victim: Model,
 	Amount: number,
-	Weapon: string, -- "Sniper" | "Knife"
+	Weapon: string,
 	Zone: string?,
 	Distance: number,
 	Origin: Vector3,
@@ -41,7 +33,6 @@ export type DamageResult = { Applied: boolean, Killed: boolean, Amount: number, 
 
 local lastDamage: { [Model]: number } = {}
 
--- Alvo pode tomar dano deste atacante?
 function DamageService.CanDamage(attacker: Player, victim: Model): boolean
 	local humanoid = victim:FindFirstChildOfClass("Humanoid")
 	if not humanoid or humanoid.Health <= 0 then
@@ -58,13 +49,13 @@ function DamageService.CanDamage(attacker: Player, victim: Model): boolean
 	local attackerContext = Registry.CharacterService.GetContext(attacker)
 
 	if not victimPlayer then
-		-- dummy do range: só quem está no lobby
+
 		return victim:GetAttribute("Dummy") == true and attackerContext.Kind == "Lobby"
 	end
 
 	local victimContext = Registry.CharacterService.GetContext(victimPlayer)
 	if attackerContext.Kind ~= "Match" or victimContext.Kind ~= "Match" then
-		return false -- ninguém se machuca no lobby
+		return false
 	end
 	if attackerContext.Match ~= victimContext.Match then
 		return false
@@ -110,7 +101,6 @@ function DamageService.Apply(info: DamageInfo): DamageResult
 	return { Applied = true, Killed = true, Amount = amount, Tags = tags }
 end
 
--- Kill feed + killcam + efeito de kill (cosmético do atacante).
 function DamageService.AnnounceKill(info: DamageInfo, victimPlayer: Player?, tags: { string })
 	local attacker = info.Attacker
 	local context = Registry.CharacterService.GetContext(attacker)
@@ -162,7 +152,6 @@ function DamageService.AnnounceKill(info: DamageInfo, victimPlayer: Player?, tag
 	end
 end
 
--- Regeneração (modos com respawn e lobby).
 local function regenLoop()
 	local step = 0.25
 	while true do

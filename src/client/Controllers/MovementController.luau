@@ -1,11 +1,3 @@
---[[
-	MovementController — andar, correr, slide e o estado de movimento usado pelo spread.
-	Movimento é do cliente (física do Roblox); o servidor só amostra velocidade com tolerância.
-
-	Slide: só a partir da corrida, no chão. LinearVelocity no plano XZ decaindo de StartSpeed
-	para EndSpeed em Duration. Pular durante o slide mantém o embalo (slide-jump).
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -30,7 +22,7 @@ local slideDir = Vector3.zero
 local lastSlideEnd = -10
 local velocity: LinearVelocity? = nil
 local cameraDrop = 0
-local speedMultiplier = 1 -- ADS / faca (WeaponController ajusta)
+local speedMultiplier = 1
 
 local mobileSprintToggle = false
 
@@ -140,7 +132,6 @@ local function update(dt: number)
 	local move = Config.Movement
 	local isFrozen = frozen()
 
-	-- correr: segurar Shift (PC/controle) ou alternar (mobile), só para frente
 	local wantsSprint = InputController.IsHeld("Sprint") or mobileSprintToggle
 	local forward = humanoid.MoveDirection:Dot((root.CFrame.LookVector * Vector3.new(1, 0, 1)).Unit) > 0.5
 	local canSprint = wantsSprint and forward and humanoid.MoveDirection.Magnitude > 0.1 and speedMultiplier >= 1 and not isFrozen
@@ -149,7 +140,6 @@ local function update(dt: number)
 	end
 	sprinting = canSprint or (sliding and sprinting)
 
-	-- slide
 	if sliding then
 		local slide = move.Slide
 		local t = (os.clock() - slideStart) / slide.Duration
@@ -161,7 +151,6 @@ local function update(dt: number)
 		end
 	end
 
-	-- velocidades
 	local walk = move.WalkSpeed * speedMultiplier
 	if isFrozen then
 		humanoid.WalkSpeed = 0
@@ -171,7 +160,6 @@ local function update(dt: number)
 		humanoid.JumpHeight = move.JumpHeight
 	end
 
-	-- câmera abaixa no slide
 	local targetDrop = if sliding then move.Slide.CameraDrop else 0
 	cameraDrop += (targetDrop - cameraDrop) * math.min(1, dt * 14)
 	humanoid.CameraOffset = Vector3.new(0, -cameraDrop, 0)
@@ -190,7 +178,7 @@ local function onCharacter(character: Model)
 		humanoid.JumpHeight = Config.Movement.JumpHeight
 		humanoid.StateChanged:Connect(function(_, new)
 			if new == Enum.HumanoidStateType.Jumping and sliding then
-				-- slide-jump: solta a restrição e deixa o embalo
+
 				endSlide()
 			end
 		end)
@@ -202,7 +190,7 @@ function MovementController.Init()
 		if action == "Slide" then
 			tryStartSlide()
 		elseif action == "Sprint" and InputController.IsHeld("Sprint") == true then
-			-- no toque o botão alterna
+
 			local UserInputService = game:GetService("UserInputService")
 			if UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled then
 				mobileSprintToggle = not mobileSprintToggle

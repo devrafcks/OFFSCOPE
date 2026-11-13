@@ -1,19 +1,10 @@
---[[
-	Theme — tokens visuais do OFFSCOPE e um `New` declarativo para montar UI sem boilerplate.
-
-	Direção de arte: cartoon em cinza e preto. Painéis cinza opacos com contorno preto grosso,
-	cantos bem arredondados e um leve gradiente; botões "3D" com base escura que afunda no clique;
-	títulos e números grandes com contorno preto (Luckiest Guy / Fredoka One).
-	Âmbar segue como cor de marca (o "flash" do disparo); raridades colorem os cosméticos.
-]]
-
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 
 local Theme = {}
 
 Theme.Colors = {
-	Ink = Color3.fromRGB(12, 12, 14), -- contornos e sombras
+	Ink = Color3.fromRGB(12, 12, 14),
 	Panel = Color3.fromRGB(44, 46, 52),
 	PanelHi = Color3.fromRGB(68, 71, 79),
 	PanelLo = Color3.fromRGB(30, 31, 36),
@@ -35,20 +26,18 @@ local function family(name: string, weight: Enum.FontWeight): Font
 end
 
 Theme.Fonts = {
-	Display = family("LuckiestGuy", Enum.FontWeight.Regular), -- números grandes e títulos
-	Title = family("FredokaOne", Enum.FontWeight.Regular), -- botões e cabeçalhos
+	Display = family("LuckiestGuy", Enum.FontWeight.Regular),
+	Title = family("FredokaOne", Enum.FontWeight.Regular),
 	Body = family("FredokaOne", Enum.FontWeight.Regular),
 	Mono = family("FredokaOne", Enum.FontWeight.Regular),
 }
 
--- contorno por família (Font é userdata: comparar pelo nome)
 local OUTLINED = { LuckiestGuy = 2.4, FredokaOne = 1.4 }
 
 local function outlineFor(font: Font): number?
 	return OUTLINED[(font.Family:match("families/(%w+)%.json") or "")]
 end
 
--- New("Frame", { Size = ..., [children] }) — tabelas na parte de array viram filhos.
 function Theme.New(className: string, props: { [any]: any }?): any
 	local instance = Instance.new(className)
 	local parent = nil
@@ -71,7 +60,6 @@ function Theme.Corner(radius: number?): UICorner
 	return Theme.New("UICorner", { CornerRadius = UDim.new(0, radius or 12) })
 end
 
--- Contorno preto no TEXTO (cartoon). Não usa ApplyStrokeMode.Border: fica no glifo.
 function Theme.TextOutline(label: GuiObject, thickness: number?)
 	Theme.New("UIStroke", {
 		Color = Theme.Colors.Ink,
@@ -82,7 +70,6 @@ function Theme.TextOutline(label: GuiObject, thickness: number?)
 	})
 end
 
--- Gradiente vertical: claro em cima, escuro embaixo. `lip` (0..1) cria a base "3D" dura.
 function Theme.Shade(target: GuiObject, color: Color3, lip: number?)
 	local light = color:Lerp(Color3.new(1, 1, 1), 0.1)
 	local dark = color:Lerp(Color3.new(0, 0, 0), 0.38)
@@ -102,15 +89,9 @@ function Theme.Shade(target: GuiObject, color: Color3, lip: number?)
 	return Theme.New("UIGradient", { Color = ColorSequence.new(keypoints), Rotation = 90, Parent = target })
 end
 
--- Piso de legibilidade (px lógicos, antes de qualquer Fit): texto nunca fica miúdo.
 Theme.MinText = 13
 Theme.MinButtonText = 14
 
---[[
-	Fit — encolhe uma janela de tamanho fixo só o necessário para caber na tela
-	(celular deitado tem ~390 px de altura). Nunca abaixo de 0,6 nem acima de 1.
-	O valor fica no atributo "FitScale" (animações de abrir devem mirar nele, não em 1).
-]]
 function Theme.Fit(frame: GuiObject, design: Vector2, margin: number?): UIScale
 	local scale = frame:FindFirstChildOfClass("UIScale") or Theme.New("UIScale", { Parent = frame })
 	local pad = margin or 24
@@ -136,7 +117,6 @@ function Theme.FitScale(frame: GuiObject): number
 	return (frame:GetAttribute("FitScale") :: number?) or 1
 end
 
--- Bordas grossas e opacas (cartoon): pedidos finos/transparentes são reforçados.
 function Theme.Stroke(color: Color3?, thickness: number?, transparency: number?): UIStroke
 	return Theme.New("UIStroke", {
 		Color = color or Theme.Colors.Line,
@@ -180,7 +160,7 @@ function Theme.Label(props: { [any]: any }): TextLabel
 	if not label.TextScaled then
 		label.TextSize = math.max(label.TextSize, Theme.MinText)
 	end
-	-- contorno preto só em texto claro (texto escuro sobre fundo claro ficaria um borrão)
+
 	local c = label.TextColor3
 	local luminance = 0.299 * c.R + 0.587 * c.G + 0.114 * c.B
 	local outline = outlineFor(label.FontFace)
@@ -206,7 +186,6 @@ function Theme.Panel(props: { [any]: any }): Frame
 	return frame
 end
 
--- Botão com hover/press animados. `style`: "Primary" | "Ghost" | "Danger"
 function Theme.Button(text: string, style: string?, props: { [any]: any }?): TextButton
 	local s = style or "Primary"
 	local bg = if s == "Primary" then Theme.Colors.Brand elseif s == "Danger" then Theme.Colors.Bad else Theme.Colors.PanelHi
@@ -228,13 +207,12 @@ function Theme.Button(text: string, style: string?, props: { [any]: any }?): Tex
 	button.TextSize = math.max(button.TextSize, Theme.MinButtonText)
 	Theme.Corner(12).Parent = button
 	Theme.Stroke(Theme.Colors.Ink, 3, 0).Parent = button
-	-- O UIGradient tingiria o texto do próprio botão: o texto vai num rótulo filho que espelha
-	-- Text/TextColor3/TextSize/FontFace (quem altera o botão continua alterando o texto).
+
 	button.TextTransparency = 1
 	local face = Theme.New("TextLabel", {
 		Name = "Face",
 		BackgroundTransparency = 1,
-		Size = UDim2.new(1, -8, 1, -4), -- sobe um pouco: senta acima da base "3D"
+		Size = UDim2.new(1, -8, 1, -4),
 		Position = UDim2.fromOffset(4, 0),
 		ZIndex = button.ZIndex + 1,
 		Parent = button,
@@ -292,7 +270,6 @@ function Theme.Button(text: string, style: string?, props: { [any]: any }?): Tex
 	return button
 end
 
--- Troca a cor de um botão do Theme (o gradiente é refeito).
 function Theme.SetButtonColor(button: TextButton, color: Color3)
 	button:SetAttribute("BaseColor", color)
 end

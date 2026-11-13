@@ -1,9 +1,3 @@
---[[
-	EnvironmentController — aplica o preset de iluminação do lugar onde o jogador está
-	(lobby ou mapa da partida), toca o ambiente sonoro e respeita o modo desempenho:
-	sem Bloom/SunRays, PrioritizeLightingQuality off e luzes secundárias dos mapas desligadas.
-]]
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
@@ -62,7 +56,7 @@ function EnvironmentController.Init()
 	ClientState.SettingsChanged:Connect(function()
 		EnvironmentController.Apply(current, 0)
 	end)
-	-- partes de mapa chegam por streaming: aplica o modo desempenho nas luzes novas
+
 	task.spawn(function()
 		local maps = Workspace:WaitForChild("Maps", 60)
 		if maps then

@@ -1,8 +1,3 @@
---[[
-	ClientState — estado do cliente vindo do servidor (perfil, partida, fila) + flags locais.
-	Controllers leem daqui e escutam os sinais; ninguém guarda cópia própria.
-]]
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")
@@ -16,7 +11,7 @@ ClientState.Profile = nil :: any
 ClientState.Match = nil :: any
 ClientState.Queue = nil :: any
 ClientState.Vote = nil :: any
-ClientState.UiOpen = false -- loja/menu aberto: libera o mouse e pausa a mira
+ClientState.UiOpen = false
 ClientState.Settings = {
 	Sensitivity = 1,
 	AdsSensitivity = Config.Camera.DefaultAdsSensitivity,

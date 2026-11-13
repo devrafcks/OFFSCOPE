@@ -1,8 +1,3 @@
---[[
-	RankedService — ELO por partida ranked e leaderboard global (OrderedDataStore).
-	Times usam a média do time adversário como oponente. Casual nunca mexe no ELO.
-]]
-
 local DataStoreService = game:GetService("DataStoreService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -39,10 +34,6 @@ local function eloOf(player: Player): number
 	return if data then data.Elo else Config.Ranked.StartElo
 end
 
---[[
-	teams: { A = {Player}, B = {Player} }, winner: "A" | "B" | nil (empate)
-	Retorna { [Player] = delta }
-]]
 function RankedService.ApplyMatch(teams: { [string]: { Player } }, winner: string?): { [Player]: number }
 	local averages = {}
 	for team, players in teams do
@@ -76,7 +67,6 @@ function RankedService.ApplyMatch(teams: { [string]: { Player } }, winner: strin
 	return deltas
 end
 
--- Abandono no meio de uma ranked conta como derrota (senão sair "salvaria" o ELO de quem está perdendo).
 function RankedService.ApplyAbandon(player: Player, opponents: { Player }): number?
 	local ratings = {}
 	for _, opponent in opponents do

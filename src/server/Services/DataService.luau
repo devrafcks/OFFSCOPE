@@ -1,10 +1,3 @@
---[[
-	DataService — perfis com ProfileStore (session lock, reconcile, autosave).
-	• Única fonte de verdade de moedas, inventário, ELO e passe.
-	• No Studio sem API Services o ProfileStore usa mock sozinho (nada salva, tudo funciona).
-	• Mudanças disparam um Sync em lote para o cliente (ProfileSync), nunca o perfil inteiro cru.
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -83,7 +76,6 @@ local function keyFor(player: Player): string
 	return Config.Data.KeyPrefix .. player.UserId
 end
 
--- Migrações leves: temporada nova, passe novo, itens removidos do catálogo.
 local function migrate(data)
 	if data.SeasonId ~= Config.Ranked.SeasonId then
 		data.Elo = Elo.SoftReset(data.Elo)
@@ -133,7 +125,6 @@ local function updateLeaderstats(player: Player, data)
 	;(folder :: any).ELO.Value = data.Elo
 end
 
--- Visão pública do perfil para o próprio jogador.
 local function publicView(data)
 	return {
 		Coins = data.Coins,
@@ -182,7 +173,6 @@ function DataService.GetData(player: Player): any?
 	return profile and profile.Data
 end
 
--- Espera o perfil carregar (ou o jogador sair). Retorna nil se não carregar.
 function DataService.Wait(player: Player, timeout: number?): any?
 	local deadline = os.clock() + (timeout or 30)
 	while profiles[player] == nil and player.Parent == Players and os.clock() < deadline do
@@ -191,7 +181,6 @@ function DataService.Wait(player: Player, timeout: number?): any?
 	return profiles[player]
 end
 
--- Mutação com sync automático: DataService.Update(player, function(data) data.Coins += 10 end)
 function DataService.Update(player: Player, mutator: (data: any) -> ()): boolean
 	local profile = profiles[player]
 	if not profile or not profile:IsActive() then
@@ -274,7 +263,7 @@ function DataService.Start()
 	end
 	Players.PlayerAdded:Connect(onPlayerAdded)
 	Players.PlayerRemoving:Connect(function(player)
-		-- adiado um passo: outros handlers de saída (ex.: abandono de ranked) ainda gravam no perfil
+
 		task.defer(function()
 			local profile = profiles[player]
 			profiles[player] = nil

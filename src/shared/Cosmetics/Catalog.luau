@@ -1,5 +1,4 @@
 --!strict
--- Consultas sobre Config.Cosmetics (só leitura).
 
 local Config = require(script.Parent.Parent.Config)
 
@@ -30,7 +29,6 @@ function Catalog.All(): { Item }
 	return list
 end
 
--- Ordena por categoria, raridade e preço — vitrines estáveis em todo cliente.
 function Catalog.Compare(a: Item, b: Item): boolean
 	if a.Category ~= b.Category then
 		return a.Category < b.Category
@@ -73,7 +71,6 @@ function Catalog.IsDefault(id: string): boolean
 	return item ~= nil and item.Pool == "default"
 end
 
--- Item → ProductId (ou nil se não vende por Robux)
 function Catalog.ProductIdFor(id: string): number?
 	local item = cache[id]
 	if item and item.PriceRobux and item.ProductId ~= 0 then
@@ -82,7 +79,6 @@ function Catalog.ProductIdFor(id: string): number?
 	return nil
 end
 
--- ProductId → itemId (para o ProcessReceipt)
 function Catalog.ItemForProduct(productId: number): string?
 	if productId == 0 then
 		return nil

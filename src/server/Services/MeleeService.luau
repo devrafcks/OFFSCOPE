@@ -1,9 +1,3 @@
---[[
-	MeleeService — faca (equipada ou ataque rápido).
-	Servidor escolhe o alvo: rewind, alcance até a hitbox mais próxima, cone de visão, LOS, e
-	backstab pelo olhar rebobinado da vítima. 1 hit nas costas, 2 na frente.
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
@@ -46,7 +40,7 @@ local function onMelee(player: Player, look: any, clientTime: any, quick: any)
 	end
 	state.LastMelee = nowClock
 	if isQuick then
-		state.ReloadToken += 1 -- faca rápida interrompe o reload
+		state.ReloadToken += 1
 		state.ReloadEnd = 0
 	end
 
@@ -87,7 +81,7 @@ local function onMelee(player: Player, look: any, clientTime: any, quick: any)
 		end
 		local toTarget = nearestPoint - origin
 		local dot = if toTarget.Magnitude > 0.01 then look:Dot(toTarget.Unit) else 1
-		-- bem colado vale mesmo com o ângulo ruim
+
 		if dot < coneDot and nearest > 1.5 then
 			continue
 		end
@@ -103,14 +97,12 @@ local function onMelee(player: Player, look: any, clientTime: any, quick: any)
 		return
 	end
 
-	-- linha de visão (não esfaquear através da parede)
 	local params = Registry.HitscanService.WorldParams()
 	local blocked = Workspace:Raycast(origin, bestPoint - origin, params)
 	if blocked and blocked.Distance < (bestPoint - origin).Magnitude - 1.2 then
 		return
 	end
 
-	-- costas: atacante atrás e olhando na mesma direção que a vítima
 	local victimRoot = bestSnapshot.LowerTorso or bestSnapshot.Torso or bestSnapshot.UpperTorso
 	local backstab = false
 	if victimRoot then

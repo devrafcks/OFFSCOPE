@@ -1,15 +1,3 @@
---[[
-	Match — uma partida do começo ao voto.
-
-	Fluxo:
-	  Warmup → (por round: Freeze → Live → RoundEnd)* → MatchEnd → Vote → fim
-	  Modos com respawn pulam os rounds: Freeze → Live (até placar/tempo) → MatchEnd → Vote.
-
-	A mesma classe roda in-place (slot afastado no servidor do lobby) e no match place.
-	O estado vai para os clientes via MatchState (snapshot pequeno) — os timers são EndsAt em
-	horário de servidor, o cliente faz a contagem sozinho.
-]]
-
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -45,7 +33,7 @@ function Match.new(params: Params)
 	self.Slot = params.Slot
 	self.OnEnded = params.OnEnded
 	self.Players = table.clone(params.Players) :: { Player }
-	self.Roster = table.clone(params.Players) :: { Player } -- quem começou (ELO)
+	self.Roster = table.clone(params.Players) :: { Player }
 	self.Teams = { A = {}, B = {} } :: { [string]: { Player } }
 	self.Stats = {} :: { [Player]: PlayerStats }
 	self.Score = { A = 0, B = 0 } :: { [string]: number }
@@ -64,7 +52,6 @@ function Match.new(params: Params)
 	return self
 end
 
--- ── consultas ───────────────────────────────────────────────────────────────
 function Match:GetPlayers(): { Player }
 	return table.clone(self.Players)
 end
@@ -96,7 +83,6 @@ function Match:IsLive(): boolean
 	return self.State == "Live"
 end
 
--- ── rede ────────────────────────────────────────────────────────────────────
 function Match:Snapshot()
 	local roster = {}
 	for player, stats in self.Stats do
@@ -151,7 +137,6 @@ function Match:Notify(text: string, kind: string?)
 	end
 end
 
--- ── times e spawns ──────────────────────────────────────────────────────────
 function Match:_assignTeams()
 	local shuffled = table.clone(self.Players)
 	for i = #shuffled, 2, -1 do
@@ -177,17 +162,16 @@ function Match:_spawnPoint(player: Player, index: number): CFrame
 		local list = spawns[team]
 		return list[(index - 1) % #list + 1]
 	end
-	-- respawn: o ponto mais longe dos inimigos vivos
+
 	local list = if team == "FFA" then spawns.FFA else spawns[team]
 	if self.Mode.TeamSize > 0 and self.State == "Live" then
-		-- em TDM pode nascer em qualquer ponto do lado, o mais seguro
+
 		list = table.clone(spawns[team])
 		for _, cf in spawns.FFA do
 			table.insert(list, cf)
 		end
 	end
-	-- Pontos usados nos últimos 2 s (spawn simultâneo no início, dois mortos juntos) contam como
-	-- "inimigos": cada spawn novo vai para o ponto mais longe dos já ocupados.
+
 	local now = os.clock()
 	self._recentSpawns = self._recentSpawns or {}
 	local recent = self._recentSpawns :: { [CFrame]: number }
@@ -207,7 +191,7 @@ function Match:_spawnPoint(player: Player, index: number): CFrame
 				nearest = math.min(nearest, (used.Position - cf.Position).Magnitude)
 			end
 		end
-		-- ninguém vivo e nada ocupado: qualquer ponto serve (fica o da ordem do jogador)
+
 		if nearest == math.huge then
 			continue
 		end
@@ -248,7 +232,7 @@ function Match:_spawnAll(frozen: boolean)
 			self:_spawn(player, index, frozen)
 		end)
 	end
-	-- espera os personagens (LoadCharacter yielda)
+
 	local deadline = os.clock() + 8
 	while os.clock() < deadline do
 		local ready = true
@@ -270,7 +254,6 @@ function Match:_setFrozen(frozen: boolean)
 	end
 end
 
--- ── eventos ─────────────────────────────────────────────────────────────────
 function Match:OnKill(info, victimPlayer: Player?)
 	local attacker: Player = info.Attacker
 	if not victimPlayer or not self:Has(attacker) or not self:Has(victimPlayer) then
@@ -342,7 +325,6 @@ function Match:RemovePlayer(player: Player)
 	self:Broadcast()
 end
 
--- ── loop ────────────────────────────────────────────────────────────────────
 local function waitUntil(deadline: number, condition: (() -> boolean)?)
 	while serverNow() < deadline do
 		if condition and condition() then
@@ -374,7 +356,6 @@ function Match:_teamHealth(team: string): number
 	return total
 end
 
--- W.O. só conta se o lado COMEÇOU com gente (teste solo no Studio não acaba na hora)
 function Match:_forfeitWinner(): string?
 	local initial = self.InitialTeams or { A = 0, B = 0, Total = 0 }
 	if self.Mode.TeamSize == 0 then
@@ -435,7 +416,7 @@ function Match:_playRounds()
 		elseif self:_aliveCount("B") == 0 and self:_aliveCount("A") > 0 then
 			winner = "A"
 		else
-			-- tempo esgotado: mais vida somada vence; empate não pontua
+
 			local ha, hb = self:_teamHealth("A"), self:_teamHealth("B")
 			winner = if ha > hb then "A" elseif hb > ha then "B" else nil
 		end
@@ -646,7 +627,7 @@ function Match:Destroy()
 			player:SetAttribute("Team", nil)
 			player:SetAttribute("MatchId", nil)
 		end
-		-- segura o personagem no lugar enquanto o mapa some (sem queda no vazio)
+
 		local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart") :: BasePart?
 		if root then
 			root.Anchored = true

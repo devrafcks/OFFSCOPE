@@ -1,9 +1,3 @@
---[[
-	MenuController — UI do lobby: cartão de perfil (nível, XP, ELO, moedas), botões JOGAR /
-	LOJA / CONFIGURAÇÕES, seletor de modos, status da fila, desafios do dia, configurações
-	(sensibilidade, scope, FOV, desempenho, FPS) e a cola de controles.
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
@@ -40,7 +34,6 @@ local MODE_ACCENT = {
 	FFA = Color3.fromRGB(255, 255, 255),
 }
 
--- ── modais ─────────────────────────────────────────────────────────────────
 function MenuController.CloseModal()
 	if openModal then
 		openModal.Visible = false
@@ -86,9 +79,8 @@ local function modal(name: string, title: string, size: Vector2): Frame
 	return frame
 end
 
--- ── perfil ─────────────────────────────────────────────────────────────────
 local function buildProfileCard()
-	-- coluna à esquerda, abaixo da área do chat do Roblox (que ocupa o canto superior esquerdo)
+
 	refs.LeftColumn = New("Frame", {
 		Name = "LeftColumn",
 		AnchorPoint = Vector2.new(0, 0.5),
@@ -121,7 +113,6 @@ local function renderProfile(profile)
 	MenuController.RenderChallenges(profile)
 end
 
--- ── desafios do dia ────────────────────────────────────────────────────────
 local function buildChallenges()
 	local panel = Theme.Panel({ Name = "Challenges", LayoutOrder = 2, Size = UDim2.fromOffset(300, 150), Parent = refs.LeftColumn })
 	Theme.Label({ Text = "DESAFIOS DO DIA", FontFace = Theme.Fonts.Title, TextSize = 12, TextColor3 = C.TextDim, Position = UDim2.fromOffset(16, 12), Size = UDim2.fromOffset(200, 14), Parent = panel })
@@ -158,7 +149,6 @@ function MenuController.RenderChallenges(profile)
 	end
 end
 
--- ── botões e fila ──────────────────────────────────────────────────────────
 local function buildActions()
 	local column = New("Frame", {
 		Name = "Actions",
@@ -210,7 +200,6 @@ local function renderQueue(queue)
 	end
 end
 
--- ── seletor de modos ───────────────────────────────────────────────────────
 local function buildPlayModal()
 	local frame = modal("PlayModal", "ESCOLHA O MODO", Vector2.new(820, 470))
 	local grid = New("Frame", {
@@ -267,7 +256,6 @@ local function buildPlayModal()
 	refs.PlayModal = frame
 end
 
--- ── configurações ──────────────────────────────────────────────────────────
 local function slider(parent: Instance, order: number, label: string, min: number, max: number, step: number, key: string, format: (number) -> string)
 	local row = New("Frame", { LayoutOrder = order, Size = UDim2.new(1, 0, 0, 52), BackgroundTransparency = 1, Parent = parent })
 	Theme.Label({ Text = label, FontFace = Theme.Fonts.Title, TextSize = 14, Size = UDim2.new(1, -80, 0, 18), Parent = row })
@@ -351,7 +339,7 @@ local function buildSettingsModal()
 	end)
 	toggle(list, 4, "Modo desempenho", "Desliga bloom, sun rays e luzes secundárias", "PerformanceMode")
 	toggle(list, 5, "Mostrar FPS", "Contador no canto da tela", "ShowFps")
-	-- sair no meio da partida (antes só dava na votação; um FFA de 8 min prendia o jogador)
+
 	local leave = Theme.Button("SAIR DA PARTIDA", "Danger", {
 		AnchorPoint = Vector2.new(0.5, 1),
 		Position = UDim2.new(0.5, 0, 1, -20),
@@ -368,13 +356,12 @@ local function buildSettingsModal()
 	refs.SettingsModal = frame
 end
 
--- ── cola de controles ──────────────────────────────────────────────────────
 local function buildHints()
 	local touch = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
 	local text = if touch
 		then "Arraste à direita para mirar · ATIRAR · SCOPE · FACA · SLIDE · CORRER"
 		else "LMB atirar  ·  RMB scope  ·  SHIFT correr  ·  C slide  ·  Q faca  ·  V faca rápida  ·  R recarregar  ·  F inspecionar  ·  TAB placar"
-	-- fundo escuro atrás do texto: legível sobre qualquer cenário (céu claro, neon, noite)
+
 	local pill = New("Frame", {
 		Name = "Hints",
 		AnchorPoint = Vector2.new(0.5, 1),
@@ -402,7 +389,6 @@ local function buildHints()
 	refs.Hints = pill
 end
 
--- tela baixa (celular deitado): só o essencial, sem empilhar painéis sobre o jogo
 local function isCompact(): boolean
 	local camera = Workspace.CurrentCamera
 	return camera ~= nil and camera.ViewportSize.Y < 600
@@ -451,7 +437,7 @@ function MenuController.Init()
 		if action == "Menu" then
 			MenuController.OpenModal(refs.SettingsModal)
 		elseif action == "Play" then
-			-- o mouse fica travado no lobby (FPS): o atalho abre os modos e libera o cursor
+
 			if not ClientState.InMatch() then
 				MenuController.OpenModal(refs.PlayModal)
 			end

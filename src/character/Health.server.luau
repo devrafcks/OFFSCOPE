@@ -1,2 +1,1 @@
--- Substitui o script "Health" padrão do Roblox (regeneração automática).
--- No OFFSCOPE a regeneração é controlada pelo servidor por modo (DamageService).
+

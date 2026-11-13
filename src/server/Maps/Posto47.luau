@@ -1,13 +1,3 @@
---[[
-	POSTO 47 — posto de fronteira num vale de serra, golden hour.
-
-	Terreno de verdade (Terrain:WriteVoxels com heightmap suave por ruído):
-	  • fundo do vale plano com a ESTRADA DE TERRA (lane mais longa do jogo, ~400 studs)
-	  • encostas de grama seca e rocha, pinheiros, pedras de meia distância
-	Construções: posto de controle no meio, hangar ao norte, bunkers, torres de vigia
-	nos spawns (A oeste, B leste), barragem ao fundo (cenário).
-]]
-
 local Workspace = game:GetService("Workspace")
 
 local MapKit = require(script.Parent.MapKit)
@@ -25,20 +15,18 @@ local MAX_Y = 72
 local RES = 4
 local SEED = 47
 
--- curva suave da estrada
 local function roadZ(x: number): number
 	return 7 * math.sin(x / 62)
 end
 
--- áreas niveladas para construções (x0, x1, z0, z1)
 local FLAT = {
-	{ -72, -2, 22, 78 }, -- hangar
-	{ -104, -76, -56, -26 }, -- bunker oeste
-	{ 76, 104, -56, -26 }, -- bunker leste
-	{ 104, 136, 28, 58 }, -- bunker norte
-	{ -196, -150, -44, 44 }, -- base A
-	{ 150, 196, -44, 44 }, -- base B
-	{ 46, 74, 40, 64 }, -- torre central
+	{ -72, -2, 22, 78 },
+	{ -104, -76, -56, -26 },
+	{ 76, 104, -56, -26 },
+	{ 104, 136, 28, 58 },
+	{ -196, -150, -44, 44 },
+	{ 150, 196, -44, 44 },
+	{ 46, 74, 40, 64 },
 }
 
 local function flatWeight(x: number, z: number): number
@@ -63,7 +51,7 @@ local function heightAt(x: number, z: number): number
 		h += math.noise(x / 46, z / 46, SEED + 1) * 7 * math.min(1, edge / 30)
 		h += math.noise(x / 14, z / 14, SEED + 2) * 1.4 * math.min(1, edge / 20)
 	end
-	-- montes nas pontas do vale: fecham a visão lá longe
+
 	local endRise = math.max(0, math.abs(x) - 205) * 0.9
 	h += endRise
 	local w = flatWeight(x, z)
@@ -105,7 +93,7 @@ local function terrain(kit)
 			local wz = minCorner.Z + (iz - 0.5) * RES - origin.Z
 			local h = heightAt(wx, wz)
 			local d = math.abs(wz - roadZ(wx))
-			-- inclinação aproximada
+
 			local slope = math.abs(heightAt(wx + RES, wz) - h) + math.abs(heightAt(wx, wz + RES) - h)
 			local surface: Enum.Material
 			if d < 8 and math.abs(wx) < 205 then
@@ -139,12 +127,12 @@ end
 local function checkpoint(kit)
 	local folder = "Checkpoint"
 	local z = roadZ(0)
-	-- guarita
+
 	kit:Box(V(-6, 0, z - 20), V(4, 9, z - 12), { Material = Enum.Material.Concrete, Color = Color3.fromRGB(196, 190, 176), Folder = folder })
 	kit:Box(V(-7, 9, z - 21), V(5, 10, z - 11), { Material = Enum.Material.Metal, Color = Color3.fromRGB(150, 40, 36), Folder = folder })
 	kit:Detail(V(10.2, 2.6, 0.2), CF(-1, 5.5, z - 11.9), { Material = Enum.Material.Glass, Color = Color3.fromRGB(150, 180, 200), Transparency = 0.5, Folder = folder })
 	kit:Sign(V(10, 2.4, 0.4), CF(-1, 12, z - 16), "POSTO 47", { Background = Color3.fromRGB(20, 40, 30), Color = Color3.fromRGB(240, 232, 200), Collide = false })
-	-- cancela e barreiras
+
 	kit:Block(V(1, 4, 1), CF(4.6, 2, z - 9), { Material = Enum.Material.Metal, Color = Color3.fromRGB(60, 60, 60), Folder = folder })
 	for i = 0, 5 do
 		kit:Detail(V(3, 0.5, 0.5), CF(4.6, 3.6, z - 7.5 + i * 3) * CFrame.Angles(0, rad(90), 0), {
@@ -156,14 +144,14 @@ local function checkpoint(kit)
 	for _, spec in { { -20, -6 }, { -20, 6 }, { 20, -2 }, { 24, 8 } } do
 		kit:Block(V(1.6, 3.2, 8), CF(spec[1], 1.6, z + spec[2]), { Name = "Barrier", Material = Enum.Material.Concrete, Color = Color3.fromRGB(170, 166, 156), Folder = folder })
 	end
-	-- sacos de areia
+
 	for i = 0, 6 do
 		kit:Block(V(3.4, 1.4, 1.8), CF(-14 + i * 3.5, 0.7 + (i % 2) * 0.1, z + 15), { Name = "Sandbag", Material = Enum.Material.Fabric, Color = Color3.fromRGB(150, 130, 96), Folder = folder })
 		if i % 2 == 0 then
 			kit:Block(V(3.4, 1.4, 1.8), CF(-12.3 + i * 3.5, 2.1, z + 15), { Name = "Sandbag", Material = Enum.Material.Fabric, Color = Color3.fromRGB(140, 122, 90), Folder = folder })
 		end
 	end
-	-- mastro
+
 	kit:Block(V(0.4, 20, 0.4), CF(-12, 10, z - 16), { Material = Enum.Material.Metal, Color = Color3.fromRGB(200, 200, 200), Folder = folder })
 	kit:Detail(V(0.1, 3, 5), CF(-12, 18, z - 13.5), { Material = Enum.Material.Fabric, Color = Color3.fromRGB(40, 110, 70), Folder = folder })
 	local lamp = kit:Detail(V(1.2, 0.4, 1.2), CF(-1, 8.6, z - 16), { Material = Enum.Material.Neon, Color = Color3.fromRGB(255, 220, 170), Folder = folder })
@@ -174,7 +162,7 @@ local function hangar(kit)
 	local folder = "Hangar"
 	local metal = { Material = Enum.Material.CorrodedMetal, Color = Color3.fromRGB(112, 118, 104), Folder = folder }
 	kit:Box(V(-66, -1, 30), V(-8, 0.4, 72), { Material = Enum.Material.Concrete, Color = Color3.fromRGB(120, 118, 110), Folder = folder })
-	-- arco aproximado por segmentos
+
 	local span = 58
 	local radius = 22
 	for i = 0, 8 do
@@ -187,9 +175,9 @@ local function hangar(kit)
 		local cf = CF(V(-37, 0.4, 51) + V(0, mid.Y, mid.X)) * CFrame.Angles(-math.atan2(p1.Y - p0.Y, p1.X - p0.X), 0, 0)
 		kit:Block(V(span, 1, length), cf, metal)
 	end
-	-- parede do fundo (norte) e laterais baixas; frente aberta para a estrada
+
 	kit:Box(V(-66, 0.4, 72), V(-8, 20, 73), metal)
-	-- interior: caixas e um caminhão
+
 	kit:Box(V(-54, 0.4, 44), V(-40, 9, 64), { Material = Enum.Material.Metal, Color = Color3.fromRGB(70, 80, 60), Folder = folder })
 	kit:Box(V(-54, 9, 44), V(-40, 12, 52), { Material = Enum.Material.Metal, Color = Color3.fromRGB(70, 80, 60), Folder = folder })
 	kit:Crate(CF(-26, 0.4, 60), 5)
@@ -203,7 +191,7 @@ end
 local function bunker(kit, x: number, z: number, facing: number)
 	local folder = "Bunkers"
 	local concrete = { Material = Enum.Material.Concrete, Color = Color3.fromRGB(132, 128, 118), Folder = folder }
-	-- base 16 × 12, seteiras de 1.4 de altura
+
 	local f = CF(x, 0, z) * CFrame.Angles(0, rad(facing), 0)
 	kit:Block(V(16, 4, 1.2), f * CF(0, 2, -6), concrete)
 	kit:Block(V(16, 1.6, 1.2), f * CF(0, 6.2, -6), concrete)
@@ -239,14 +227,14 @@ local function watchtower(kit, base: Vector3)
 end
 
 local function nature(kit)
-	-- pedras de meia distância perto da estrada (cobertura do mid)
+
 	local rockSpots = { -150, -128, -112, -64, -40, 36, 58, 118, 140, 162 }
 	for i, x in rockSpots do
 		local side = if i % 2 == 0 then 1 else -1
 		local z = roadZ(x) + side * kit.Rng:NextNumber(12, 22)
 		kit:Rock(at(x, z), kit.Rng:NextNumber(3.5, 6))
 	end
-	-- pinheiros nas encostas (fora das lanes)
+
 	local planted = 0
 	local attempts = 0
 	while planted < 70 and attempts < 400 do
@@ -260,14 +248,14 @@ local function nature(kit)
 			planted += 1
 		end
 	end
-	-- cerca de fronteira (postes ao longo da encosta sul)
+
 	for x = -190, 190, 12 do
 		local z = -92
 		local p = at(x, z)
 		kit:Block(V(0.4, 7, 0.4), CF(p + V(0, 3.5, 0)), { Material = Enum.Material.Metal, Color = Color3.fromRGB(90, 92, 94), Folder = "Fence" })
 		kit:Detail(V(12, 5, 0.1), CF(p + V(6, 4, 0)), { Material = Enum.Material.Fabric, Color = Color3.fromRGB(120, 124, 128), Transparency = 0.75, Folder = "Fence" })
 	end
-	-- barragem ao fundo (cenário, fora do limite)
+
 	kit:Box(V(250, -10, -150), V(264, 80, 150), { Material = Enum.Material.Concrete, Color = Color3.fromRGB(176, 172, 162), Folder = "Dam", Shadow = true })
 	for z = -140, 140, 20 do
 		kit:Detail(V(1, 90, 3), CF(249.5, 35, z), { Material = Enum.Material.Concrete, Color = Color3.fromRGB(150, 146, 136), Folder = "Dam" })

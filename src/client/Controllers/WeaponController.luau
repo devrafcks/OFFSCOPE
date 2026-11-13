@@ -1,11 +1,3 @@
---[[
-	WeaponController — máquina de estados da sniper e da faca no cliente.
-
-	O tiro é PREVISTO aqui (som, flash, tracer, impacto, recoil na hora) e o servidor confirma.
-	O cliente manda origem, olhar, semente e spread — o servidor reproduz a mesma direção com
-	Spread.Apply e decide o hit. Hitmarker só aparece com a confirmação (HitConfirm).
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -100,7 +92,6 @@ function WeaponController.Spread(): number
 	return state.LastSpread
 end
 
--- ── raycast local (previsão) ───────────────────────────────────────────────
 local function localParams(): RaycastParams
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
@@ -128,7 +119,6 @@ local function isCharacterPart(instance: Instance): boolean
 	return false
 end
 
--- ── ações ──────────────────────────────────────────────────────────────────
 local function sendScope(scoped: boolean)
 	if state.ScopeSent ~= scoped then
 		state.ScopeSent = scoped
@@ -195,7 +185,6 @@ local function shoot()
 	local origin = camera.CFrame.Position
 	state.ShotId += 1
 
-	-- previsão local
 	local result = Workspace:Raycast(origin, direction * S.Range, localParams())
 	local hitPos = if result then result.Position else origin + direction * S.Range
 	local muzzle = ViewmodelController.MuzzleCFrame()
@@ -276,18 +265,15 @@ local function inspect()
 	state.InspectStart = now()
 end
 
--- ── loop ───────────────────────────────────────────────────────────────────
 local function update(dt: number)
 	local t = now()
 	local isAlive = alive()
 
-	-- reload terminou (o servidor confirma via AmmoSync; aqui é a previsão)
 	if state.ReloadStart and t - state.ReloadStart >= S.ReloadTime then
 		state.ReloadStart = nil
 		state.Mag = S.MagSize
 	end
 
-	-- ADS
 	local wantsAim = InputController.IsHeld("Aim") and state.Slot == "Sniper" and isAlive and not ClientState.UiOpen
 	local blocked = reloading() or quickActive() or equipping() or t < state.AdsLockedUntil
 	state.AdsTarget = wantsAim and not blocked
@@ -298,12 +284,10 @@ local function update(dt: number)
 		state.InspectStart = -10
 	end
 
-	-- faca segurando o botão = golpes seguidos
 	if state.Slot == "Knife" and InputController.IsHeld("Fire") then
 		swing()
 	end
 
-	-- spread atual (retículo dinâmico)
 	local move = MovementController.State()
 	state.LastSpread = Spread.Compute({
 		Speed = move.Speed,
@@ -313,11 +297,9 @@ local function update(dt: number)
 		AdsAlpha = state.AdsAlpha,
 	})
 
-	-- velocidade: scope deixa lento, faca deixa rápido
 	local multiplier = if state.Slot == "Knife" then Config.Movement.KnifeSpeedMultiplier else 1 + (Config.Movement.AdsSpeedMultiplier - 1) * state.AdsAlpha
 	MovementController.SetSpeedMultiplier(multiplier)
 
-	-- alimenta câmera, viewmodel e HUD
 	CameraController.SetAds(state.AdsAlpha)
 	local boltProgress = if t >= state.BoltStart and t < state.NextFire then math.clamp((t - state.BoltStart) / (S.BoltTime - 0.2), 0, 1) else 0
 	if boltProgress >= 1 then

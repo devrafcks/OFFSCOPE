@@ -1,5 +1,3 @@
--- Mola amortecida (semi-implícita) para Vector3 — usada em sway, recoil e bob da viewmodel.
-
 export type Spring = {
 	Position: Vector3,
 	Velocity: Vector3,
@@ -29,7 +27,7 @@ function Spring:Impulse(force: Vector3)
 end
 
 function Spring:Step(dt: number): Vector3
-	-- sub-passos fixos: estável mesmo com dt grande (hitch de frame)
+
 	local remaining = math.min(dt, 0.1)
 	local stepSize = 1 / 240
 	while remaining > 0 do

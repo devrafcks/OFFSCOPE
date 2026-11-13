@@ -1,11 +1,3 @@
---[[
-	EffectsController — tudo que é visual/sonoro e local: tracers, muzzle flash, impactos,
-	furos, glint da luneta inimiga, kill effects e sons 3D. Nada aqui afeta gameplay.
-
-	Partículas usam texturas que já vêm com o client (rbxasset://textures/particles/...).
-	Pools e limites mantêm o custo fixo mesmo em FFA cheio.
-]]
-
 local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -88,7 +80,6 @@ local function burst(position: Vector3, normal: Vector3, props: { [string]: any 
 	Debris:AddItem(attachment, lifetime or 2)
 end
 
--- ── tracers ────────────────────────────────────────────────────────────────
 function EffectsController.Tracer(from: Vector3, to: Vector3, tracerId: string?)
 	local def = Config.Cosmetics[tracerId or ""] or Config.Cosmetics[Config.DefaultEquipped.Tracer]
 	local visual = def.Visual
@@ -97,13 +88,12 @@ function EffectsController.Tracer(from: Vector3, to: Vector3, tracerId: string?)
 		return
 	end
 	local width = visual.Width or 0.06
-	-- risco fino que some
+
 	local line = fxPart(Vector3.new(width * 0.6, width * 0.6, distance), CFrame.lookAt((from + to) / 2, to), visual.Color)
 	line.Transparency = 0.55
 	TweenService:Create(line, TweenInfo.new(0.16), { Transparency = 1 }):Play()
 	Debris:AddItem(line, 0.2)
 
-	-- "bala" visível correndo pelo caminho (o hit já aconteceu — é só leitura)
 	local streakLength = math.min(28, distance)
 	local streak = fxPart(Vector3.new(width, width, streakLength), CFrame.lookAt(from, to), visual.Color)
 	if visual.Glow then
@@ -147,7 +137,7 @@ function EffectsController.MuzzleFlash(cf: CFrame, firstPerson: boolean?)
 	TweenService:Create(light, TweenInfo.new(0.06), { Brightness = 0 }):Play()
 	Debris:AddItem(flash, 0.1)
 	Debris:AddItem(cone, 0.1)
-	-- fumacinha do cano
+
 	burst(cf.Position, cf.LookVector, {
 		Texture = SMOKE,
 		Color = ColorSequence.new(Color3.fromRGB(190, 190, 190)),
@@ -161,10 +151,9 @@ function EffectsController.MuzzleFlash(cf: CFrame, firstPerson: boolean?)
 	}, 3)
 end
 
--- ── impactos ───────────────────────────────────────────────────────────────
 function EffectsController.Impact(position: Vector3, normal: Vector3, materialName: string?, character: boolean?)
 	if character then
-		-- sem gore: faísca curta + "poeira" escura
+
 		burst(position, normal, {
 			Texture = SPARK,
 			Color = ColorSequence.new(Color3.fromRGB(255, 220, 160)),
@@ -213,7 +202,7 @@ function EffectsController.Impact(position: Vector3, normal: Vector3, materialNa
 		}, 8)
 		Audio.Play3D("ImpactConcrete", { Position = position, Pitch = 0.9 + math.random() * 0.2 })
 	end
-	-- furo (disco escuro) com pool
+
 	local hole = fxPart(Vector3.new(0.02, 0.32, 0.32), CFrame.lookAt(position + normal * 0.01, position + normal) * CFrame.Angles(0, math.rad(90), 0), Color3.fromRGB(16, 15, 14), Enum.Material.SmoothPlastic)
 	hole.Shape = Enum.PartType.Cylinder
 	table.insert(holes, hole)
@@ -231,7 +220,6 @@ function EffectsController.Impact(position: Vector3, normal: Vector3, materialNa
 	end)
 end
 
--- ── kill effects (cosméticos) ──────────────────────────────────────────────
 function EffectsController.KillEffect(effectId: string, position: Vector3)
 	local def = Config.Cosmetics[effectId]
 	local kind = def and def.Visual.Kind or "None"
@@ -293,7 +281,6 @@ function EffectsController.KillEffect(effectId: string, position: Vector3)
 	end
 end
 
--- ── glint da luneta inimiga ────────────────────────────────────────────────
 local glints: { [Model]: BillboardGui } = {}
 
 local function makeGlint(): BillboardGui
@@ -341,7 +328,7 @@ local function updateGlints()
 		local scoped = character:GetAttribute("Scoped") == true and character:GetAttribute("Weapon") == "Sniper"
 		local gui = glints[character]
 		if scoped then
-			-- só aparece para quem está na frente da luneta
+
 			local root = character:FindFirstChild("HumanoidRootPart") :: BasePart?
 			local pitch = (character:GetAttribute("Pitch") :: number?) or 0
 			local facing = if root then (root.CFrame * CFrame.Angles(pitch, 0, 0)).LookVector else head.CFrame.LookVector
@@ -376,7 +363,6 @@ local function updateGlints()
 	end
 end
 
--- ── remotos ────────────────────────────────────────────────────────────────
 local function thirdPersonMuzzle(shooter: Player): CFrame?
 	local character = shooter.Character
 	local weapon = character and character:FindFirstChild("WorldSniper")
@@ -397,7 +383,6 @@ local function onShotFx(shooter: Player, origin: Vector3, hitPos: Vector3, norma
 	local distance = (camera.CFrame.Position - origin).Magnitude
 	Audio.Play3D(if distance > 160 then "SniperShotDistant" else "SniperShot", { Position = origin, RollOff = 1400, Pitch = 0.96 + math.random() * 0.08 })
 
-	-- zumbido: a bala passou perto de mim?
 	local dir = (hitPos - origin)
 	local length = dir.Magnitude
 	if length > 1 then
@@ -433,7 +418,7 @@ function EffectsController.Start()
 		accumulator += dt
 		if accumulator >= 1 / 20 then
 			accumulator = 0
-			-- o glint é informação de gameplay: nunca desliga no modo desempenho
+
 			updateGlints()
 		end
 	end)

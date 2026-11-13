@@ -1,8 +1,3 @@
---[[
-	MatchUiController — tudo que é da partida: placar no topo, cronômetro, banners de round,
-	scoreboard (Tab), tela de resultado (moedas, XP, ELO) e a votação de mapa (20 s).
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -39,7 +34,6 @@ local function myTeam(match): string
 	return "FFA"
 end
 
--- resultados chegam com chave UserId (número ou string, conforme a serialização do remote)
 local function myResult(match)
 	local results = match and match.Results
 	if not results then
@@ -52,7 +46,6 @@ local function teamColor(team: string?): Color3
 	return if team == "A" then C.TeamA elseif team == "B" then C.TeamB else C.Text
 end
 
--- ── construção ─────────────────────────────────────────────────────────────
 local function buildTopBar()
 	local bar = New("Frame", {
 		Name = "ScoreBar",
@@ -170,7 +163,6 @@ local function buildVote()
 	refs.VoteCards = {}
 end
 
--- ── render ─────────────────────────────────────────────────────────────────
 local MAP_TINTS = {
 	Cais09 = { Color3.fromRGB(214, 150, 140), Color3.fromRGB(60, 70, 100) },
 	Avenida11 = { Color3.fromRGB(110, 60, 200), Color3.fromRGB(20, 20, 50) },
@@ -319,7 +311,6 @@ local function render(match)
 		end
 	end
 
-	-- resultado pessoal
 	local result = myResult(match)
 	refs.Results.Visible = (match.State == "MatchEnd" or match.State == "Vote") and result ~= nil
 	if result then
@@ -382,7 +373,7 @@ function MatchUiController.Init()
 		render(match)
 		if not match or match.State ~= "Vote" then
 			renderVote(nil)
-			-- partida emendada após o voto: devolve o mouse para a mira
+
 			if match and ClientState.UiOpen then
 				ClientState.SetUiOpen(false)
 			end

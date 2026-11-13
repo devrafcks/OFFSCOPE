@@ -67,8 +67,8 @@ cada luz e cada sombra entram num orçamento.
 
 O projeto foi construído em **pair programming com o [Claude](https://claude.ai) (Claude Code)**. Eu defini a visão,
 as regras e as decisões de design; o Claude acelerou a escrita, a pesquisa de APIs e a validação. Foi um exercício de
-**como trabalhar bem com uma IA num projeto grande**: escopo claro, decisões documentadas
-([`docs/`](docs)), commits pequenos e checagem automática (tipos + lint + build) em todo push.
+**como trabalhar bem com uma IA num projeto grande**: escopo claro, decisões documentadas,
+commits pequenos e checagem automática (tipos + lint + build) em todo push.
 
 É um projeto pessoal, feito por diversão e aprendizado, mas tratado com padrão profissional.
 
@@ -176,7 +176,7 @@ src/
 Sem Knit (o repositório foi arquivado) e sem roblox-ts. Cada serviço é um módulo com `Init()`/`Start()`, e as dependências
 entre eles passam por um `Registry` em tempo de execução, o que evita `require` circular.
 
-📚 Documentação completa: [**GDD**](docs/GDD.md) · [**Arquitetura**](docs/arquitetura.md) · [**Marcos**](docs/marcos.md) · [**Produtos**](docs/produtos.md) · [Pesquisa original](docs/briefing/pesquisa.md)
+📚 Documentação: [**Lançamento**](docs/lancamento.md) · [**Produtos**](docs/produtos.md)
 
 ---
 

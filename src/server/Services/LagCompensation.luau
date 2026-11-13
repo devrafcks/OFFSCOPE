@@ -1,11 +1,3 @@
---[[
-	LagCompensation — histórico de hitboxes para rewind (padrão RollbackHitbox).
-
-	A 30 Hz guarda o CFrame de cada parte do corpo de cada alvo registrado (jogadores e dummies).
-	Buffer circular de ~1 s. `Sample(model, t)` interpola entre os dois snapshots vizinhos.
-	O relógio é workspace:GetServerTimeNow() — o mesmo que o cliente manda no tiro.
-]]
-
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -22,7 +14,7 @@ export type Track = {
 	Parts: { [string]: BasePart },
 	Sizes: { [string]: Vector3 },
 	Buffer: { Snapshot },
-	Head: number, -- índice do mais recente
+	Head: number,
 	Count: number,
 }
 
@@ -33,11 +25,6 @@ local function now(): number
 	return Workspace:GetServerTimeNow()
 end
 
---[[
-	Mantém as referências das partes atualizadas. Se alguma parte do corpo for trocada depois
-	do registro (acessório/descrição aplicada de novo, rig refeito), uma referência velha deixaria
-	essa zona fora do histórico. Custo: um FindFirstChild só quando a referência ficou órfã.
-]]
 local function resolveParts(track: Track)
 	local model = track.Model
 	for _, name in Hitbox.TrackedParts do
@@ -97,7 +84,6 @@ local function record(track: Track, time: number)
 	track.Count = math.min(track.Count + 1, CAPACITY)
 end
 
--- Snapshot interpolado no instante `t` (clampado ao intervalo gravado).
 function LagCompensation.Sample(model: Model, t: number): { [string]: CFrame }?
 	local track = tracks[model]
 	if not track or track.Count == 0 then
@@ -105,7 +91,7 @@ function LagCompensation.Sample(model: Model, t: number): { [string]: CFrame }?
 	end
 	local newest = track.Buffer[track.Head]
 	if t >= newest.Time then
-		-- mais novo que o último snapshot: usa a pose atual (mais precisa)
+
 		local live = {}
 		for name, part in track.Parts do
 			live[name] = part.CFrame
@@ -127,10 +113,9 @@ function LagCompensation.Sample(model: Model, t: number): { [string]: CFrame }?
 		end
 		older = snap
 	end
-	return older.CFrames -- mais antigo disponível
+	return older.CFrames
 end
 
--- Instante de rewind para um tiro enviado em `clientTime` por `player`.
 function LagCompensation.RewindTime(player: Player, clientTime: number): number
 	local n = Config.Netcode
 	local current = now()

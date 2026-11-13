@@ -1,5 +1,4 @@
 --!strict
--- Faixas de ranked a partir do ELO.
 
 local Config = require(script.Parent.Parent.Config)
 
@@ -19,7 +18,6 @@ function Ranks.For(elo: number): Tier
 	return { Name = tier.Name, MinElo = tier.MinElo, Color = tier.Color, Index = chosen }
 end
 
--- Progresso (0..1) dentro da faixa atual.
 function Ranks.Progress(elo: number): number
 	local tiers = Config.Ranked.Tiers
 	local current = Ranks.For(elo)

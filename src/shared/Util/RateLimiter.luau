@@ -1,5 +1,3 @@
--- Token bucket por chave (ex.: por jogador). Capacidade e recarga vêm do Config.Netcode.RemoteBudgets.
-
 export type RateLimiter = {
 	Allow: (self: RateLimiter, key: any, cost: number?) -> boolean,
 	Forget: (self: RateLimiter, key: any) -> (),

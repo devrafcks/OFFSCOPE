@@ -1,16 +1,4 @@
 --!strict
---[[
-	HoldPose — pose de "segurando a arma" + inclinação pelo pitch, aplicada por frame.
-	Roda no cliente (o que os jogadores veem) e no servidor (para as hitboxes dos braços
-	baterem com o que os clientes desenham).
-
-	O servidor grava BaseC0/HoldC0 como atributos das juntas (CharacterService) e o
-	atributo "Pitch" do personagem (~12 Hz). Aqui:
-	• AnimationConstraint (avatar novo): Transform = Base⁻¹·Hold·tilt, todo frame, em
-	  PreSimulation — depois do Animator, que senão recalcula o Transform e desfaz a pose.
-	• Motor6D (rig clássico): C0 = Hold·tilt, só onde `posesMotors` deixar
-	  (no servidor o C0 já vem replicado; no cliente, o próprio personagem também).
-]]
 
 local Players = game:GetService("Players")
 

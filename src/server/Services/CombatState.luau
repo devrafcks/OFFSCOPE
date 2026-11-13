@@ -1,8 +1,3 @@
---[[
-	CombatState — estado autoritativo da arma de cada jogador (no servidor).
-	Munição, ferrolho, reload, slot equipado, scope. O cliente prevê; o servidor confere.
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -68,10 +63,9 @@ function CombatState.ScopeTime(state: State): number
 	return if state.ScopeStart then os.clock() - state.ScopeStart else 0
 end
 
--- Alpha de ADS máximo plausível agora (o cliente não pode dizer "estou 100% no scope" em 0 s).
 function CombatState.MaxAdsAlpha(state: State): number
 	if not state.ScopeStart then
-		return 0.2 -- tolerância de rede: o "unscope" pode chegar depois do tiro
+		return 0.2
 	end
 	return math.clamp((os.clock() - state.ScopeStart) / Config.Sniper.Ads.Time + 0.25, 0, 1)
 end
@@ -120,7 +114,7 @@ function CombatState.Init()
 			return
 		end
 		state.Slot = slot
-		state.ReloadToken += 1 -- cancela reload em andamento
+		state.ReloadToken += 1
 		state.ReloadEnd = 0
 		state.ScopeStart = nil
 		state.EquipEnd = os.clock() + (if slot == "Knife" then Config.Knife.EquipTime else Config.Sniper.EquipTime)

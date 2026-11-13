@@ -1,12 +1,3 @@
---[[
-	RoundService — cria e acompanha as partidas (Match).
-
-	Papel do servidor:
-	  • "Lobby": partidas in-place em slots afastados (até Config.Maps.MaxConcurrentInPlace).
-	  • "Match": match place publicado; lê TeleportData {Mode, MapId, Expected}, roda UMA partida
-	    e devolve todo mundo ao lobby no fim (ou emenda outra partida após o voto).
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -102,9 +93,6 @@ function RoundService.StartMatch(modeId: string, players: { Player }, mapId: str
 	return true
 end
 
--- Jogador pediu para sair da partida (botão "Voltar ao lobby").
--- desconectar no meio de uma ranked = derrota de ELO na hora
--- (o fim da partida só conta quem ainda está no servidor; sem isso, sair do jogo "salvaria" o ELO)
 local function penalizeAbandon(match, player: Player)
 	if not match.Mode.Ranked or match.State == "MatchEnd" or match.State == "Vote" then
 		return
@@ -127,13 +115,12 @@ function RoundService.Leave(player: Player)
 		return
 	end
 	playerMatch[player] = nil
-	-- quem volta ao lobby continua no Roster da partida: o fim da ranked já conta a derrota
+
 	match:RemovePlayer(player)
 	Remotes.Event("MatchState"):FireClient(player, nil)
 	returnToLobby({ player })
 end
 
--- Match place: espera os jogadores que vieram juntos e começa.
 local function bootMatchPlace()
 	local expected: { number } = {}
 	local modeId = "Duel"
@@ -160,7 +147,7 @@ local function bootMatchPlace()
 
 	Players.PlayerAdded:Connect(function(player)
 		if started then
-			-- reconexão / atrasado: volta ao lobby
+
 			Registry.TeleportServiceWrapper.ToLobby({ player })
 			return
 		end

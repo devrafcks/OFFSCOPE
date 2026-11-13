@@ -1,9 +1,3 @@
---[[
-	OFFSCOPE — bootstrap do servidor.
-	Ordem: Remotes → require de todos os serviços → Init (ligações) → Start (loops).
-	Cada serviço é um módulo simples com Init()/Start() opcionais. Sem Knit (arquivado).
-]]
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")

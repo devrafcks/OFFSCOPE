@@ -1,9 +1,3 @@
---[[
-	TeleportServiceWrapper — SafeTeleport (padrão da doc oficial de teleport).
-	pcall + retry com espera + reenvio em TeleportInitFailed. Só o servidor teleporta.
-	TeleportData leva apenas { Mode, MapId, Ranked, Teams } — nada de economia.
-]]
-
 local TeleportService = game:GetService("TeleportService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -34,7 +28,6 @@ function TeleportServiceWrapper.SafeTeleport(placeId: number, players: { Player 
 	return success
 end
 
--- Reserva um servidor do match place. Retorna o access code (ou nil).
 function TeleportServiceWrapper.Reserve(placeId: number): string?
 	local ok, code = pcall(function()
 		local accessCode = TeleportService:ReserveServer(placeId)

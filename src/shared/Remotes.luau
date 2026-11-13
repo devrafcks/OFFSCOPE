@@ -1,48 +1,40 @@
---[[
-	Remotes — lista única de RemoteEvents/Functions.
-	O servidor cria as instâncias em ReplicatedStorage.Remotes; o cliente espera por elas.
-
-	Regra da casa: o cliente NUNCA diz "acertei". Ele manda intenção (origem, direção, semente),
-	o servidor decide.
-]]
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local EVENTS = {
-	-- cliente → servidor
-	"Fire", -- (origin, look, seed, spread, serverTime, adsAlpha, shotId)
-	"Melee", -- (look, serverTime, quick)
+
+	"Fire",
+	"Melee",
 	"Reload",
-	"Equip", -- (slot: "Sniper" | "Knife")
-	"Scope", -- (scoped: boolean)
-	"Vote", -- (mapId)
-	"SaveSettings", -- (settings table)
-	"Queue", -- (modeId | nil)
-	-- servidor → cliente
-	"HitConfirm", -- { Zone, Damage, Killed, Target, ShotId, Tags }
-	"ShotFx", -- (shooter, origin, hitPos, normal, material, tracerId, hitCharacter)
-	"MeleeFx", -- (attacker, hitPos, backstab)
-	"KillFeed", -- { Killer, Victim, Weapon, Tags, Distance, KillerTeam, VictimTeam }
-	"Killed", -- (killcam data) para a vítima
-	"Damaged", -- (fromPosition, amount) para a vítima
-	"MatchState", -- snapshot do placar / estado
-	"Toast", -- { Text, Kind, Coins }
-	"ProfileSync", -- dados do perfil que o cliente pode ver
-	"Environment", -- (presetId)
-	"VoteState", -- { Options, Votes, EndsAt }
-	"QueueState", -- { Mode, Count, Needed }
-	"KillEffect", -- (effectId, position, killer) para todos por perto
-	"AmmoSync", -- (mag, reserve) correção autoritativa
+	"Equip",
+	"Scope",
+	"Vote",
+	"SaveSettings",
+	"Queue",
+
+	"HitConfirm",
+	"ShotFx",
+	"MeleeFx",
+	"KillFeed",
+	"Killed",
+	"Damaged",
+	"MatchState",
+	"Toast",
+	"ProfileSync",
+	"Environment",
+	"VoteState",
+	"QueueState",
+	"KillEffect",
+	"AmmoSync",
 }
 
 local FUNCTIONS = {
-	"Shop", -- (action, payload) -> result
-	"GetShop", -- () -> vitrine (loja diária, catálogo, passe)
+	"Shop",
+	"GetShop",
 }
 
 local UNRELIABLE = {
-	"Look", -- (pitch, yaw) ~12 Hz
+	"Look",
 }
 
 local Remotes = {}

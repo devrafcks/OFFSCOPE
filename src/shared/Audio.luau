@@ -1,9 +1,3 @@
---[[
-	Audio — toca sons por chave (Config.Audio). Resolve o id em AssetIds (upload próprio)
-	ou cai para o fallback local `rbxasset://` que vem com o client do Roblox.
-	Nunca usa áudio de terceiros com copyright.
-]]
-
 local Debris = game:GetService("Debris")
 local SoundService = game:GetService("SoundService")
 local Workspace = game:GetService("Workspace")
@@ -60,7 +54,6 @@ function Audio.Create(key: string, options: PlayOptions?): Sound?
 	return sound
 end
 
--- Som 2D (UI, primeira pessoa).
 function Audio.Play2D(key: string, options: PlayOptions?)
 	local sound = Audio.Create(key, options)
 	if not sound then
@@ -71,7 +64,6 @@ function Audio.Play2D(key: string, options: PlayOptions?)
 	Debris:AddItem(sound, math.max(sound.TimeLength, 3) + 1)
 end
 
--- Som 3D numa posição do mundo ou preso a uma instância.
 function Audio.Play3D(key: string, options: PlayOptions?): Sound?
 	local opts = options or {}
 	local sound = Audio.Create(key, opts)

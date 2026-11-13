@@ -1,8 +1,3 @@
---[[
-	KnifeBuilder — faca de campanha (e variante tanto). Root no punho, lâmina para −Z.
-	Grupos: Blade, Handle, Guard (pintados pelo WrapPainter.PaintKnife).
-]]
-
 local ModelKit = require(script.Parent.ModelKit)
 
 local KnifeBuilder = {}
@@ -24,7 +19,6 @@ function KnifeBuilder.Build(shape: string?): Knife
 		return ModelKit.Part(model, spec)
 	end
 
-	-- cabo com textura de borracha e anéis
 	P({ Name = "Handle", Size = V(0.15, 0.2, 0.6), CFrame = CF(0, 0, 0.1), Group = "Handle" })
 	for i = 0, 2 do
 		P({ Name = "HandleRing", Size = V(0.16, 0.21, 0.04), CFrame = CF(0, 0, -0.08 + i * 0.16), Group = "Guard" })
@@ -52,7 +46,7 @@ function KnifeBuilder.Build(shape: string?): Knife
 			Group = "Blade",
 		})
 	end
-	-- fio da lâmina (faixa clara)
+
 	P({ Name = "Edge", Size = V(0.038, 0.035, 0.84), CFrame = CF(0, -0.07, -0.68), Group = "Blade", Reflectance = 0.15 })
 
 	ModelKit.Attachment(root, "Tip", CF(0, 0.02, -1.45))

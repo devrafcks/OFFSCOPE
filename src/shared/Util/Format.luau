@@ -1,5 +1,3 @@
--- Formatação pt-BR: milhar com ponto, tempo mm:ss, distância em metros.
-
 local Format = {}
 
 function Format.Number(value: number): string
@@ -17,7 +15,6 @@ function Format.Time(seconds: number): string
 	return string.format("%d:%02d", seconds // 60, seconds % 60)
 end
 
--- 1 stud ≈ 0,28 m (escala de avatar padrão)
 function Format.Meters(studs: number): string
 	return string.format("%dm", math.floor(studs * 0.28 + 0.5))
 end

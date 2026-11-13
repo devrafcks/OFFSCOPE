@@ -1,5 +1,4 @@
 --!strict
--- ELO clássico. Times usam a média do time como rating de entrada.
 
 local Config = require(script.Parent.Parent.Config)
 
@@ -14,7 +13,6 @@ function Elo.KFactor(matchesPlayed: number): number
 	return if matchesPlayed < r.NewPlayerMatches then r.KFactorNew else r.KFactor
 end
 
--- score: 1 vitória, 0 derrota, 0.5 empate
 function Elo.Delta(rating: number, opponent: number, score: number, matchesPlayed: number): number
 	local k = Elo.KFactor(matchesPlayed)
 	return math.floor(k * (score - Elo.Expected(rating, opponent)) + 0.5)
@@ -35,7 +33,6 @@ function Elo.Average(ratings: { number }): number
 	return sum / #ratings
 end
 
--- Soft reset de temporada: puxa todo mundo para perto do início.
 function Elo.SoftReset(rating: number): number
 	local r = Config.Ranked
 	return math.floor(r.StartElo + (rating - r.StartElo) * r.SoftResetWeight + 0.5)

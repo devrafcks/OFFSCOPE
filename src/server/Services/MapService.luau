@@ -1,9 +1,3 @@
---[[
-	MapService — carrega UM mapa por partida num "slot" e descarrega no fim.
-	Slot 0 = origem (lobby, ou a partida no match place). Slots 1..N = arenas in-place afastadas.
-	Os outros mapas nunca são instanciados.
-]]
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerScriptService = game:GetService("ServerScriptService")
 
@@ -35,7 +29,6 @@ function MapService.SlotOrigin(slot: number): CFrame
 	return CFrame.new(slot * Config.Maps.SlotSpacing, 0, 0)
 end
 
--- `allowZero` = match place (não há lobby na origem).
 function MapService.AcquireSlot(allowZero: boolean?): number?
 	local first = if allowZero then 0 else 1
 	for slot = first, Config.Maps.MaxConcurrentInPlace do

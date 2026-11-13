@@ -1,15 +1,3 @@
---[[
-	MapKit — vocabulário para construir mapas com Parts, materiais nativos e Terrain.
-
-	Todo mapa do OFFSCOPE é código: dá para revisar num PR, gerar variações com semente e
-	carregar só o mapa da partida (os outros nunca existem na memória).
-
-	Regras de performance embutidas:
-	  • Estrutura (piso, paredes, cobertura): colide, bloqueia tiro (CanQuery), projeta sombra.
-	  • Detalhe (Detail): não colide, não bloqueia tiro, SEM sombra.
-	  • Luz com sombra só quando pedida explicitamente (`Shadows = true`).
-]]
-
 local Workspace = game:GetService("Workspace")
 
 local MapKit = {}
@@ -63,7 +51,7 @@ export type BlockOptions = {
 	Color: Color3?,
 	Transparency: number?,
 	Reflectance: number?,
-	Detail: boolean?, -- sem colisão/sombra/tiro
+	Detail: boolean?,
 	Collide: boolean?,
 	Shadow: boolean?,
 	Shape: Enum.PartType?,
@@ -72,7 +60,6 @@ export type BlockOptions = {
 	Truss: boolean?,
 }
 
--- Bloco em coordenadas LOCAIS do mapa.
 function MapKit:Block(size: Vector3, localCFrame: CFrame, options: BlockOptions?): BasePart
 	local opts = options or {}
 	local part: BasePart
@@ -112,7 +99,6 @@ function MapKit:Block(size: Vector3, localCFrame: CFrame, options: BlockOptions?
 	return part
 end
 
--- Atalho: bloco de min..max (cantos) — fácil de ler em planta baixa.
 function MapKit:Box(min: Vector3, max: Vector3, options: BlockOptions?): BasePart
 	local size = V(math.abs(max.X - min.X), math.abs(max.Y - min.Y), math.abs(max.Z - min.Z))
 	return self:Block(size, CF((min + max) / 2), options)
@@ -124,7 +110,6 @@ function MapKit:Detail(size: Vector3, localCFrame: CFrame, options: BlockOptions
 	return self:Block(size, localCFrame, opts)
 end
 
--- Parede invisível de limite (bloqueia movimento, não bloqueia tiro nem aparece).
 function MapKit:Barrier(min: Vector3, max: Vector3)
 	local part = self:Box(min, max, { Name = "Barrier", Transparency = 1, Folder = "Bounds", Shadow = false })
 	part.CanQuery = false
@@ -132,7 +117,7 @@ function MapKit:Barrier(min: Vector3, max: Vector3)
 end
 
 export type LightOptions = {
-	Kind: string?, -- "Point" | "Spot" | "Surface"
+	Kind: string?,
 	Color: Color3?,
 	Range: number?,
 	Brightness: number?,
@@ -175,7 +160,6 @@ function MapKit:Spawn(team: string, localPosition: Vector3, lookAt: Vector3)
 	end
 end
 
--- Placa com texto (neon, sinalização). Face frontal = −Z do bloco.
 function MapKit:Sign(size: Vector3, localCFrame: CFrame, text: string, options: { [string]: any }?)
 	local opts = options or {}
 	local board = self:Block(size, localCFrame, {
@@ -212,19 +196,16 @@ function MapKit:Sign(size: Vector3, localCFrame: CFrame, text: string, options: 
 	return board
 end
 
--- ── props reutilizáveis ─────────────────────────────────────────────────────
-
 local CONTAINER_COLORS = {
-	Color3.fromRGB(142, 52, 38), -- ferrugem
-	Color3.fromRGB(40, 78, 120), -- azul
-	Color3.fromRGB(56, 96, 64), -- verde
-	Color3.fromRGB(196, 110, 36), -- laranja
-	Color3.fromRGB(110, 112, 116), -- cinza
-	Color3.fromRGB(198, 196, 186), -- branco sujo
-	Color3.fromRGB(150, 34, 44), -- vermelho
+	Color3.fromRGB(142, 52, 38),
+	Color3.fromRGB(40, 78, 120),
+	Color3.fromRGB(56, 96, 64),
+	Color3.fromRGB(196, 110, 36),
+	Color3.fromRGB(110, 112, 116),
+	Color3.fromRGB(198, 196, 186),
+	Color3.fromRGB(150, 34, 44),
 }
 
--- Container de 40 pés (≈ 20 × 8.5 × 8 studs) com nervuras, portas e travas.
 function MapKit:Container(localCFrame: CFrame, color: Color3?, detailed: boolean?): BasePart
 	local c = color or CONTAINER_COLORS[self.Rng:NextInteger(1, #CONTAINER_COLORS)]
 	local size = V(8, 8.5, 20)
@@ -234,12 +215,12 @@ function MapKit:Container(localCFrame: CFrame, color: Color3?, detailed: boolean
 		for i = -4, 4 do
 			self:Detail(V(8.15, 7.9, 0.35), localCFrame * CF(0, 0, i * 2.1), { Material = Enum.Material.CorrodedMetal, Color = dark, Folder = "Containers" })
 		end
-		-- portas (fundo +Z) e travas
+
 		self:Detail(V(7.6, 7.8, 0.2), localCFrame * CF(0, 0, 10.05), { Material = Enum.Material.Metal, Color = dark, Folder = "Containers" })
 		for _, x in { -1.4, 1.4 } do
 			self:Detail(V(0.14, 7.6, 0.14), localCFrame * CF(x, 0, 10.2), { Material = Enum.Material.Metal, Color = Color3.fromRGB(60, 60, 62), Folder = "Containers" })
 		end
-		-- cantoneiras
+
 		for _, x in { -3.9, 3.9 } do
 			for _, z in { -9.9, 9.9 } do
 				self:Detail(V(0.4, 8.6, 0.4), localCFrame * CF(x, 0, z), { Material = Enum.Material.Metal, Color = Color3.fromRGB(40, 40, 42), Folder = "Containers" })
@@ -253,7 +234,6 @@ function MapKit:ContainerColor(): Color3
 	return CONTAINER_COLORS[self.Rng:NextInteger(1, #CONTAINER_COLORS)]
 end
 
--- Poça d'água: lâmina fina escura e reflexiva (o Realistic lighting faz o resto).
 function MapKit:Puddle(localPosition: Vector3, width: number, depth: number)
 	local part = self:Block(V(width, 0.05, depth), CF(localPosition + V(0, 0.03, 0)) * CFrame.Angles(0, self.Rng:NextNumber() * math.pi, 0), {
 		Name = "Puddle",
@@ -267,7 +247,6 @@ function MapKit:Puddle(localPosition: Vector3, width: number, depth: number)
 	return part
 end
 
--- Poste de luz. `shadows` só nos que importam para a leitura do mapa.
 function MapKit:StreetLamp(localPosition: Vector3, facing: Vector3, color: Color3?, shadows: boolean?)
 	local pole = self:Block(V(0.6, 16, 0.6), CF(localPosition + V(0, 8, 0)), {
 		Name = "LampPole",
@@ -290,7 +269,6 @@ function MapKit:StreetLamp(localPosition: Vector3, facing: Vector3, color: Color
 	return pole
 end
 
--- Pinheiro: tronco + 4 camadas cônicas aproximadas por cilindros achatados.
 function MapKit:Pine(localPosition: Vector3, height: number)
 	local trunk = self:Block(V(height * 0.55, 1.1, 1.1), CF(localPosition + V(0, height * 0.27, 0)) * CFrame.Angles(0, 0, math.rad(90)), {
 		Name = "Trunk",
@@ -317,7 +295,6 @@ function MapKit:Pine(localPosition: Vector3, height: number)
 	return trunk
 end
 
--- Rocha: dois blocos rotacionados de basalto/pedra (cobertura de meia distância).
 function MapKit:Rock(localPosition: Vector3, size: number)
 	local material = if self.Rng:NextNumber() > 0.5 then Enum.Material.Rock else Enum.Material.Slate
 	local color = Color3.fromRGB(108, 100, 92):Lerp(Color3.fromRGB(140, 132, 120), self.Rng:NextNumber())
@@ -331,7 +308,6 @@ function MapKit:Rock(localPosition: Vector3, size: number)
 	end
 end
 
--- Carro sedã low-poly (cobertura baixa).
 function MapKit:Car(localCFrame: CFrame, color: Color3)
 	local folder = "Vehicles"
 	self:Block(V(6.4, 2.2, 13), localCFrame * CF(0, 1.9, 0), { Name = "CarBody", Material = Enum.Material.Metal, Color = color, Reflectance = 0.08, Folder = folder })
@@ -352,7 +328,6 @@ function MapKit:Car(localCFrame: CFrame, color: Color3)
 	self:Detail(V(5.6, 0.4, 0.2), localCFrame * CF(0, 2.5, 6.55), { Material = Enum.Material.Neon, Color = Color3.fromRGB(200, 20, 30), Folder = folder })
 end
 
--- Caixote / pallet com textura de madeira.
 function MapKit:Crate(localCFrame: CFrame, size: number?)
 	local s = size or 4
 	return self:Block(V(s, s, s), localCFrame * CF(0, s / 2, 0), { Name = "Crate", Material = Enum.Material.WoodPlanks, Color = Color3.fromRGB(150, 116, 76), Folder = "Props" })
@@ -368,7 +343,6 @@ function MapKit:Barrel(localPosition: Vector3, color: Color3?)
 	})
 end
 
--- Escada (wedge) de min.Y até max.Y ao longo de `direction` (+Z local por padrão).
 function MapKit:Ramp(localCFrame: CFrame, width: number, height: number, length: number, options: BlockOptions?)
 	local opts = table.clone(options or {})
 	opts.Wedge = true
@@ -376,10 +350,6 @@ function MapKit:Ramp(localCFrame: CFrame, width: number, height: number, length:
 	return self:Block(V(width, height, length), localCFrame * CF(0, height / 2, 0), opts)
 end
 
---[[
-	Escada de degraus sólidos (sem ambiguidade de orientação de wedge).
-	`base` é o pé da escada (centro do 1º degrau no chão), `direction` é para onde ela sobe.
-]]
 function MapKit:Stairs(base: Vector3, direction: Vector3, width: number, rise: number, steps: number, options: BlockOptions?)
 	local opts = table.clone(options or {})
 	opts.Name = opts.Name or "Step"
@@ -396,21 +366,17 @@ function MapKit:Stairs(base: Vector3, direction: Vector3, width: number, rise: n
 	return run * steps
 end
 
--- Corrimão simples (detalhe) entre dois pontos locais.
 function MapKit:Rail(a: Vector3, b: Vector3, color: Color3?)
 	local mid = (a + b) / 2
 	local length = (b - a).Magnitude
 	self:Detail(V(0.18, 0.18, length), CFrame.lookAt(mid, b), { Material = Enum.Material.Metal, Color = color or Color3.fromRGB(200, 170, 40), Folder = "Rails" })
 end
 
--- ── Terrain ──────────────────────────────────────────────────────────────────
-
 function MapKit:TerrainBlock(localCFrame: CFrame, size: Vector3, material: Enum.Material)
 	local cf = self.Origin * localCFrame
 	Workspace.Terrain:FillBlock(cf, size, material)
 end
 
--- Marca uma região para limpar quando o mapa descarregar.
 function MapKit:ClaimTerrain(localCenter: Vector3, size: Vector3)
 	table.insert(self.TerrainRegions, { CFrame = self.Origin * CF(localCenter), Size = size })
 end

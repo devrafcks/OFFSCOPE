@@ -1,9 +1,3 @@
---[[
-	LobbyService — o "hub": constrói o lobby, nasce os jogadores, cuida dos pads de fila,
-	dos dummies do range e do quadro de ranking.
-	No match place nada disso existe (não há lobby lá).
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -27,7 +21,6 @@ local boardGui: SurfaceGui? = nil
 
 local PAD_RADIUS = 6.2
 
--- ── jogadores ──────────────────────────────────────────────────────────────
 function LobbyService.SpawnInLobby(player: Player)
 	if not extras or player.Parent ~= Players then
 		return
@@ -38,7 +31,6 @@ function LobbyService.SpawnInLobby(player: Player)
 	Registry.CharacterService.Spawn(player, cf, { Regen = true, Preset = "Lobby" })
 end
 
--- ── pads ───────────────────────────────────────────────────────────────────
 local function buildPadGui(modeId: string, cf: CFrame)
 	local anchor = Instance.new("Part")
 	anchor.Name = "PadLabel_" .. modeId
@@ -52,7 +44,7 @@ local function buildPadGui(modeId: string, cf: CFrame)
 	anchor.Parent = built.Model
 
 	local gui = Instance.new("BillboardGui")
-	-- tamanho em studs: encolhe com a distância e os rótulos dos pads não se sobrepõem
+
 	gui.Size = UDim2.fromScale(9, 3.6)
 	gui.MaxDistance = 90
 	gui.LightInfluence = 0
@@ -120,7 +112,6 @@ local function padLoop()
 	end
 end
 
--- ── dummies do range ───────────────────────────────────────────────────────
 local function getTemplate(): Model?
 	if dummyTemplate then
 		return dummyTemplate
@@ -205,7 +196,6 @@ local function spawnDummies()
 	end
 end
 
--- ── ranking ────────────────────────────────────────────────────────────────
 function LobbyService.RenderLeaderboard(board: { any })
 	if not extras then
 		return
@@ -262,7 +252,6 @@ function LobbyService.RenderLeaderboard(board: { any })
 	end
 end
 
--- ── kiosk ──────────────────────────────────────────────────────────────────
 local function setupKiosk()
 	local prompt = Instance.new("ProximityPrompt")
 	prompt.Name = "OpenShop"

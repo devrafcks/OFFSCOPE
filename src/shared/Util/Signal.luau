@@ -1,5 +1,3 @@
--- Signal mínimo (sem BindableEvent): conexões em lista, Fire síncrono, Wait com coroutine.
-
 export type Connection = { Connected: boolean, Disconnect: (self: Connection) -> () }
 export type Signal<T...> = {
 	Connect: (self: Signal<T...>, fn: (T...) -> ()) -> Connection,
@@ -48,7 +46,7 @@ function Signal:Once(fn)
 end
 
 function Signal:Fire(...)
-	-- cópia rasa: handlers podem desconectar durante o Fire
+
 	local snapshot = table.clone(self._handlers)
 	for _, connection in snapshot do
 		if connection.Connected then

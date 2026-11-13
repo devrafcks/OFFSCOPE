@@ -1,17 +1,3 @@
---[[
-	LOBBY — "Base OFFSCOPE": hangar militar a céu aberto no meio da serra.
-	Praça circular com os portais de fila, monólito com o logo e vitrines da arma,
-	heliponto com helicóptero, pátio de carga, loja (Arsenal), quadro de ranking
-	e o RANGE de treino a leste (alvos a 25/50/100/150/200/260 studs).
-	Fora dos muros: pinheiros e montanhas — tudo Detail (sem colisão/sombra/tiro).
-
-	Planta (vista de cima, +X → leste/range, +Z → norte/monólito):
-	  z +90  ── muro norte ── [bosque]   [vitrine] MONÓLITO [vitrine]   [jipe + sacos de areia]
-	  z +12          ARSENAL (x −74..−50)      ( praça com 6 portais )       → RANGE (x 120..404)
-	  z −20  RANKING (x −98)
-	  z −60  [HELIPONTO]            [spawn / drop zone]            [pátio de contêineres]
-]]
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local MapKit = require(script.Parent.MapKit)
@@ -58,7 +44,6 @@ local OLIVE = C(78, 88, 62)
 local ORANGE = C(236, 122, 38)
 local HELIPAD_CENTER = V(-82, 0, -62)
 
--- áreas onde os pilares da marquise não entram (heliponto e pilhas de contêineres)
 local function columnBlocked(x: number, z: number): boolean
 	if (V(x, 0, z) - HELIPAD_CENTER).Magnitude < 27 then
 		return true
@@ -83,7 +68,6 @@ local function cylDetailY(kit, height: number, diameter: number, position: Vecto
 	return cylY(kit, height, diameter, position, opts)
 end
 
--- cilindro de a até b (eixo X do Cylinder alinhado ao segmento)
 local function beam(kit, a: Vector3, b: Vector3, diameter: number, options)
 	local opts = table.clone(options)
 	opts.Shape = opts.Shape or Enum.PartType.Cylinder
@@ -91,17 +75,16 @@ local function beam(kit, a: Vector3, b: Vector3, diameter: number, options)
 	return kit:Detail(V(length, diameter, diameter), CFrame.lookAt((a + b) / 2, b) * CFrame.Angles(0, rad(90), 0), opts)
 end
 
--- ── chão, muros e estrutura do hangar ────────────────────────────────────────
 local function ground(kit)
 	kit:Box(V(-120, -4, -90), V(120, 0, 90), { Name = "Plaza", Material = Enum.Material.Concrete, Color = CONCRETE, Reflectance = 0.04 })
-	-- juntas de dilatação em placas de 20 studs
+
 	for x = -100, 100, 20 do
 		kit:Detail(V(0.3, 0.03, 180), CF(x, 0.02, 0), { Material = Enum.Material.SmoothPlastic, Color = C(96, 98, 102) })
 	end
 	for z = -80, 80, 20 do
 		kit:Detail(V(240, 0.03, 0.3), CF(0, 0.02, z), { Material = Enum.Material.SmoothPlastic, Color = C(96, 98, 102) })
 	end
-	-- terreno de fora (some sob os muros; dá chão para o bosque e as montanhas)
+
 	kit:Detail(V(2400, 1, 2400), CF(140, -0.6, 0), { Name = "Outside", Material = Enum.Material.Grass, Color = C(84, 98, 62), Folder = "Scenery" })
 end
 
@@ -112,7 +95,7 @@ local function walls(kit)
 	kit:Box(V(-120, 0, -91), V(120, 18, -90), wall)
 	kit:Box(V(120, 0, 30), V(121, 18, 91), wall)
 	kit:Box(V(120, 0, -91), V(121, 18, -30), wall)
-	-- rodapé de segurança (amarelo + preto) e faixa de janelas
+
 	local folder = "Hangar"
 	local function trim(size: Vector3, cf: CFrame)
 		kit:Detail(size + V(0, -0.4, 0), cf * CF(0, 0.2, 0), { Material = Enum.Material.SmoothPlastic, Color = HAZARD, Folder = folder })
@@ -127,7 +110,6 @@ local function walls(kit)
 	kit:Detail(V(0.3, 5, 176), CF(-120.6, 12.5, 0), { Material = Enum.Material.Glass, Color = C(150, 180, 200), Transparency = 0.5, Reflectance = 0.25, Folder = folder })
 end
 
--- pilares em I + marquise com treliça e luz por baixo nos muros norte, sul e oeste
 local function canopy(kit)
 	local folder = "Hangar"
 	local depth = 14
@@ -139,7 +121,7 @@ local function canopy(kit)
 		kit:Detail(V(0.5, 22, 1.6), CF(x, 11, z), { Material = Enum.Material.Metal, Color = STEEL, Folder = folder })
 		kit:Detail(V(2.6, 0.6, 2.6), CF(x, 0.3, z), { Material = Enum.Material.Metal, Color = STEEL_LIGHT, Folder = folder })
 	end
-	-- norte e sul
+
 	for _, side in { -1, 1 } do
 		local wallZ = side * 90
 		local edgeZ = side * (90 - depth)
@@ -149,27 +131,27 @@ local function canopy(kit)
 		strip.Transparency = 0.15
 		for x = -110, 110, 20 do
 			column(x, edgeZ)
-			-- treliça diagonal do pilar até o muro
+
 			if columnBlocked(x, edgeZ) then
 				continue
 			end
 			beam(kit, V(x, 14, edgeZ), V(x, 22, wallZ), 0.5, { Material = Enum.Material.Metal, Color = STEEL, Folder = folder })
 		end
 	end
-	-- oeste (sem cobrir a loja e o ranking por inteiro)
+
 	kit:Detail(V(depth, 1, 152), CF(-120 + depth / 2, 22.5, 0), { Name = "Canopy", Material = Enum.Material.Metal, Color = C(58, 62, 68), Folder = folder })
 	kit:Detail(V(0.8, 1.4, 152), CF(-120 + depth, 21.6, 0), { Material = Enum.Material.Metal, Color = STEEL, Folder = folder })
 	for z = -60, 60, 30 do
 		column(-120 + depth, z)
 	end
-	-- luzes reais só em poucos pontos (custo)
+
 	for _, x in { -60, 60 } do
 		for _, side in { -1, 1 } do
 			local holder = kit:Detail(V(6, 0.3, 2), CF(x, 21.7, side * (90 - depth / 2)), { Material = Enum.Material.Neon, Color = C(255, 236, 200), Folder = folder })
 			kit:Light(holder, { Kind = "Surface", Face = Enum.NormalId.Bottom, Range = 22, Angle = 120, Brightness = 1.2 })
 		end
 	end
-	-- banners pendurados na borda da marquise
+
 	local bannerColors = { C(20, 21, 24), ORANGE, C(20, 21, 24) }
 	for i, x in { -80, 0, 80 } do
 		for _, side in { -1, 1 } do
@@ -181,7 +163,6 @@ local function canopy(kit)
 	end
 end
 
--- ── praça central ────────────────────────────────────────────────────────────
 local function plaza(kit)
 	local folder = "Plaza"
 	local c = PLAZA_CENTER
@@ -190,14 +171,14 @@ local function plaza(kit)
 	local ring = cylDetailY(kit, 0.16, 64, c + V(0, 0.08, 0), { Material = Enum.Material.Neon, Color = ORANGE, Folder = folder })
 	ring.Transparency = 0.6
 	cylDetailY(kit, 0.18, 62, c + V(0, 0.09, 0), { Material = Enum.Material.Slate, Color = C(44, 47, 54), Folder = folder })
-	-- emblema de mira no centro
+
 	cylDetailY(kit, 0.2, 14, c + V(0, 0.1, 0), { Material = Enum.Material.SmoothPlastic, Color = C(230, 230, 226), Folder = folder })
 	cylDetailY(kit, 0.22, 12, c + V(0, 0.11, 0), { Material = Enum.Material.Slate, Color = C(44, 47, 54), Folder = folder })
 	cylDetailY(kit, 0.24, 2, c + V(0, 0.12, 0), { Material = Enum.Material.Neon, Color = ORANGE, Folder = folder })
 	for _, angle in { 0, 90 } do
 		kit:Detail(V(22, 0.22, 0.5), CF(c + V(0, 0.11, 0)) * CFrame.Angles(0, rad(angle), 0), { Material = Enum.Material.SmoothPlastic, Color = C(230, 230, 226), Folder = folder })
 	end
-	-- passarela do spawn até a praça
+
 	kit:Detail(V(14, 0.1, 30), CF(0, 0.05, -49), { Material = Enum.Material.Slate, Color = C(60, 63, 70), Folder = folder })
 	for _, x in { -7.2, 7.2 } do
 		kit:Detail(V(0.5, 0.12, 30), CF(x, 0.06, -49), { Material = Enum.Material.SmoothPlastic, Color = HAZARD, Folder = folder })
@@ -231,7 +212,6 @@ local function monolith(kit)
 	})
 end
 
--- vitrines com o Vanta-7 pintado (mostra o que a loja vende, sem vender nada aqui)
 local function displays(kit)
 	local folder = "Displays"
 	for _, entry in { { X = -46, Wrap = "wrap_aurora", Label = "AURORA AUSTRAL" }, { X = 46, Wrap = "wrap_magma", Label = "MAGMA" } } do
@@ -263,7 +243,6 @@ local function displays(kit)
 	end
 end
 
--- ── portais de fila ──────────────────────────────────────────────────────────
 local function pads(kit): { [string]: CFrame }
 	local result = {}
 	local center = V(0, 0, 12)
@@ -296,7 +275,6 @@ local function pads(kit): { [string]: CFrame }
 		})
 		kit:Light(ring, { Kind = "Point", Color = color, Range = 12, Brightness = 1 })
 
-		-- portal: dois pilares + viga com neon, de frente para o centro da praça
 		local facing = CFrame.lookAt(position, V(PLAZA_CENTER.X, 0, PLAZA_CENTER.Z - 40))
 		local folder = "Gates"
 		for _, side in { -1, 1 } do
@@ -314,9 +292,8 @@ local function pads(kit): { [string]: CFrame }
 	return result
 end
 
--- ── heliponto ────────────────────────────────────────────────────────────────
 local function helicopter(kit, at: CFrame)
-	-- modelado em unidades "de projeto" e escalado: 1,8× deixa o helicóptero maior que um contêiner
+
 	local k = 1.8
 	local function S(x: number, y: number, z: number): Vector3
 		return V(x * k, y * k, z * k)
@@ -333,27 +310,27 @@ local function helicopter(kit, at: CFrame)
 	local function detail(size: Vector3, cf: CFrame, opts)
 		return kit:Detail(size, at * cf, opts)
 	end
-	-- fuselagem: cilindro + duas esferas (nariz e traseira)
+
 	block(S(9, 5.6, 5.6), P(0, 4.4, 0) * CFrame.Angles(0, rad(90), 0), { Name = "Fuselage", Shape = Enum.PartType.Cylinder, Material = body.Material, Color = body.Color, Folder = folder })
 	block(S(5.6, 5.6, 5.6), P(0, 4.4, -4.5), { Name = "Nose", Shape = Enum.PartType.Ball, Material = body.Material, Color = body.Color, Folder = folder })
 	block(S(5.2, 5.2, 5.2), P(0, 4.5, 4.4), { Name = "Rear", Shape = Enum.PartType.Ball, Material = body.Material, Color = body.Color, Folder = folder })
 	detail(S(4.9, 4.9, 4.9), P(0, 5.1, -5.6), { Material = Enum.Material.Glass, Color = C(30, 44, 56), Transparency = 0.15, Reflectance = 0.3, Shape = Enum.PartType.Ball, Folder = folder })
 	detail(S(5.7, 0.5, 9.2), P(0, 3.2, 0), { Material = Enum.Material.Metal, Color = C(34, 36, 38), Folder = folder })
 	detail(S(5.7, 0.6, 3), P(0, 4.6, 0.6), { Material = Enum.Material.SmoothPlastic, Color = ORANGE, Folder = folder })
-	-- motor e mastro
+
 	detail(S(3, 1.6, 5), P(0, 7.4, 1), dark)
 	detail(S(0.6, 1.6, 0.6), P(0, 8.9, 0), dark)
 	detail(S(1.6, 0.5, 1.6), P(0, 9.8, 0), dark)
 	for i = 0, 3 do
 		detail(S(0.9, 0.12, 15), P(0, 9.95, 0) * CFrame.Angles(0, rad(i * 45 + 12), 0), dark)
 	end
-	-- cauda
+
 	beam(kit, (at * P(0, 5.6, 5)).Position, (at * P(0, 6.6, 16)).Position, 1.5 * k, { Material = Enum.Material.Metal, Color = OLIVE, Folder = folder })
 	detail(S(0.4, 4, 2.4), P(0, 8, 16) * CFrame.Angles(rad(-15), 0, 0), body)
 	detail(S(4, 0.3, 1.4), P(0, 6.5, 15.4), body)
 	detail(S(0.15, 3.4, 0.4), P(0.4, 8.2, 16.4), dark)
 	detail(S(0.15, 0.4, 3.4), P(0.4, 8.2, 16.4), dark)
-	-- esquis
+
 	for _, x in { -2.8, 2.8 } do
 		beam(kit, (at * P(x, 0.35, -5.6)).Position, (at * P(x, 0.35, 5.6)).Position, 0.45 * k, dark)
 		beam(kit, (at * P(x, 0.35, -5.6)).Position, (at * P(x, 0.9, -6.6)).Position, 0.45 * k, dark)
@@ -368,7 +345,7 @@ local function helipad(kit)
 	local center = HELIPAD_CENTER
 	cylDetailY(kit, 0.12, 46, center + V(0, 0.05, 0), { Material = Enum.Material.SmoothPlastic, Color = C(200, 200, 196), Folder = folder })
 	cylDetailY(kit, 0.14, 44, center + V(0, 0.06, 0), { Material = Enum.Material.Asphalt, Color = C(46, 48, 52), Folder = folder })
-	-- "H"
+
 	for _, x in { -4, 4 } do
 		kit:Detail(V(2, 0.16, 16), CF(center + V(x * 1.3, 0.08, 0)), { Material = Enum.Material.SmoothPlastic, Color = C(230, 230, 226), Folder = folder })
 	end
@@ -381,7 +358,6 @@ local function helipad(kit)
 	helicopter(kit, CF(center) * CFrame.Angles(0, rad(-55), 0))
 end
 
--- ── pátio de carga e props militares ────────────────────────────────────────
 local function sandbags(kit, center: Vector3, radius: number, fromDeg: number, toDeg: number)
 	local folder = "Props"
 	local step = 2.6 / radius
@@ -410,7 +386,7 @@ local function ammoCrate(kit, cf: CFrame)
 end
 
 local function cargoYard(kit)
-	-- sudeste: contêineres empilhados (cobrem o canto e quebram a linha do muro)
+
 	kit:Container(CF(108, 4.25, -70), C(56, 96, 64))
 	kit:Container(CF(108, 12.75, -70) * CFrame.Angles(0, rad(4), 0), C(196, 110, 36))
 	kit:Container(CF(98, 4.25, -76) * CFrame.Angles(0, rad(90), 0), C(40, 78, 120))
@@ -424,13 +400,13 @@ local function cargoYard(kit)
 	kit:Barrel(V(61, 0, -84), ORANGE)
 	ammoCrate(kit, CF(80, 0, -58) * CFrame.Angles(0, rad(20), 0))
 	ammoCrate(kit, CF(80, 1.8, -58) * CFrame.Angles(0, rad(28), 0))
-	-- nordeste: jipe + barricada de sacos de areia + caixas de munição
+
 	kit:Car(CF(96, 0, 66) * CFrame.Angles(0, rad(-115), 0), OLIVE)
 	sandbags(kit, V(80, 0, 52), 9, 160, 290)
 	ammoCrate(kit, CF(74, 0, 74) * CFrame.Angles(0, rad(-10), 0))
 	ammoCrate(kit, CF(70, 0, 78) * CFrame.Angles(0, rad(15), 0))
 	kit:Container(CF(110, 4.25, 78) * CFrame.Angles(0, rad(90), 0), C(142, 52, 38))
-	-- sudoeste do spawn: caixotes ao lado do heliponto
+
 	for i, cf in { CF(-56, 0, -80), CF(-52, 0, -82), CF(-54, 4, -81) } do
 		kit:Crate(cf * CFrame.Angles(0, rad(i * 23), 0), 4)
 	end
@@ -439,7 +415,6 @@ local function cargoYard(kit)
 	end
 end
 
--- canteiros com pinheiros e bancos (noroeste) + bancos perto do spawn
 local function garden(kit)
 	for i, pos in { V(-100, 0, 66), V(-82, 0, 76), V(-104, 0, 44), V(-64, 0, 80) } do
 		kit:Box(pos - V(5, 0, 5), pos + V(5, 2, 5), { Material = Enum.Material.Concrete, Color = C(96, 98, 102), Folder = "Garden" })
@@ -457,7 +432,6 @@ local function garden(kit)
 	end
 end
 
--- torres de holofote nos quatro cantos (treliça + cabeça; uma luz cada)
 local function floodlights(kit)
 	for _, spec in { { V(-104, 0, -76), V(0, 0, 0) }, { V(-104, 0, 76), V(0, 0, 0) }, { V(104, 0, 44), V(0, 0, 0) }, { V(-30, 0, -80), V(0, 0, 0) } } do
 		local base, target = spec[1], spec[2]
@@ -469,7 +443,6 @@ local function floodlights(kit)
 	end
 end
 
--- ── cenário de fora: bosque e serra ─────────────────────────────────────────
 local function scenery(kit)
 	local folder = "Scenery"
 	local rng = Random.new(47)
@@ -492,7 +465,7 @@ local function scenery(kit)
 			})
 		end
 	end
-	-- faixas de bosque ao redor do hangar (fora das barreiras)
+
 	local function band(minV: Vector3, maxV: Vector3, count: number)
 		for _ = 1, count do
 			local pos = V(rng:NextNumber(minV.X, maxV.X), 0, rng:NextNumber(minV.Z, maxV.Z))
@@ -502,7 +475,7 @@ local function scenery(kit)
 	band(V(-200, 0, 104), V(420, 0, 190), 46)
 	band(V(-200, 0, -190), V(420, 0, -104), 46)
 	band(V(-230, 0, -100), V(-136, 0, 100), 22)
-	-- serra ao fundo: cada pico são duas cunhas costas-com-costas (cumeeira) + capa de neve
+
 	local function peak(base: Vector3, width: number, height: number, depth: number, yaw: number, color: Color3)
 		local cf = CF(base) * CFrame.Angles(0, yaw, 0)
 		for _, side in { -1, 1 } do
@@ -523,28 +496,27 @@ local function scenery(kit)
 		local center = V(140 + math.cos(angle) * distance, -2, math.sin(angle) * distance)
 		local height = rng:NextNumber(120, 240)
 		local color = C(84, 94, 104):Lerp(C(116, 124, 132), rng:NextNumber())
-		-- cumeeira perpendicular à linha de visão + um pico menor ao lado
+
 		local yaw = -angle + math.pi / 2 + rng:NextNumber(-0.3, 0.3)
 		peak(center, height * 1.1, height, height * 1.6, yaw + math.pi / 2, color)
 		peak(center + V(rng:NextNumber(-90, 90), -2, rng:NextNumber(-90, 90)), height * 0.8, height * 0.62, height, yaw + math.pi / 2 + 0.5, color:Lerp(C(70, 80, 90), 0.3))
 	end
 end
 
--- ── range de treino (inalterado na jogabilidade) ─────────────────────────────
 local function range(kit)
 	local folder = "Range"
-	-- corredor do range (x 120..400, z −30..30)
+
 	kit:Box(V(120, -4, -30), V(404, 0, 30), { Material = Enum.Material.Concrete, Color = C(110, 106, 98), Folder = folder })
 	kit:Box(V(120, 0, -31), V(404, 16, -30), { Material = Enum.Material.Concrete, Color = C(80, 80, 84), Folder = folder })
 	kit:Box(V(120, 0, 30), V(404, 16, 31), { Material = Enum.Material.Concrete, Color = C(80, 80, 84), Folder = folder })
-	kit:Box(V(400, 0, -31), V(404, 30, 31), { Material = Enum.Material.Ground, Color = C(110, 86, 60), Folder = folder }) -- barreira de terra
-	-- linha de tiro com cabines
+	kit:Box(V(400, 0, -31), V(404, 30, 31), { Material = Enum.Material.Ground, Color = C(110, 86, 60), Folder = folder })
+
 	kit:Box(V(126, 0, -30), V(127, 4, 30), { Material = Enum.Material.WoodPlanks, Color = C(130, 98, 66), Folder = folder })
 	for z = -30, 30, 12 do
 		kit:Box(V(118, 0, z - 0.3), V(127, 8, z + 0.3), { Material = Enum.Material.Concrete, Color = C(90, 90, 94), Folder = folder })
 	end
 	kit:Detail(V(0.2, 0.04, 60), CF(127.5, 0.02, 0), { Material = Enum.Material.SmoothPlastic, Color = C(240, 60, 40), Folder = folder })
-	-- marcadores de distância
+
 	for _, d in { 25, 50, 100, 150, 200, 260 } do
 		local x = 127 + d
 		kit:Detail(V(0.4, 0.05, 60), CF(x, 0.03, 0), { Material = Enum.Material.SmoothPlastic, Color = C(200, 200, 196), Folder = folder })
@@ -559,7 +531,7 @@ local function range(kit)
 		Color = C(255, 255, 255),
 		Glow = true,
 	})
-	-- sacos de areia no fundo e luzes do range (só uma com sombra)
+
 	for i, x in { 150, 230, 320 } do
 		local lamp = kit:Detail(V(4, 0.4, 40), CF(x, 15.6, 0), { Material = Enum.Material.Neon, Color = C(230, 240, 255), Folder = folder })
 		kit:Light(lamp, { Kind = "Surface", Face = Enum.NormalId.Bottom, Range = 22, Angle = 120, Brightness = 1.6, Shadows = i == 1 })
@@ -578,7 +550,7 @@ local function rangeTargets(kit): ({ CFrame }, { any }, { BasePart })
 		local x = 127 + d + 2
 		local z = lanes[(i - 1) % #lanes + 1]
 		table.insert(dummies, kit.Origin * CFrame.lookAt(V(x, 3, z), V(120, 3, z)))
-		-- trilho com dummy em movimento (a cada duas distâncias)
+
 		if i % 2 == 0 then
 			local zr = lanes[(i + 1) % #lanes + 1]
 			kit:Detail(V(1, 0.2, 24), CF(x + 6, 0.1, zr), { Material = Enum.Material.Metal, Color = C(60, 60, 64), Folder = "Range" })
@@ -588,7 +560,7 @@ local function rangeTargets(kit): ({ CFrame }, { any }, { BasePart })
 				Period = 2.4 + i * 0.4,
 			})
 		end
-		-- placa de aço (gongo) — feedback sonoro
+
 		local plate = kit:Block(V(0.4, 2.6, 2.6), CF(x + 1, 6.4, z + 5), {
 			Name = "SteelPlate",
 			Material = Enum.Material.Metal,
@@ -602,7 +574,6 @@ local function rangeTargets(kit): ({ CFrame }, { any }, { BasePart })
 	return dummies, moving, plates
 end
 
--- ── loja (Arsenal) e ranking ────────────────────────────────────────────────
 local function kiosk(kit): BasePart
 	kit:Box(V(-74, 0, 22), V(-50, 1, 42), { Material = Enum.Material.Marble, Color = C(220, 220, 216) })
 	local counter = kit:Box(V(-70, 1, 26), V(-54, 4.2, 30), { Name = "ShopCounter", Material = Enum.Material.Metal, Color = C(26, 28, 32) })
@@ -611,7 +582,7 @@ local function kiosk(kit): BasePart
 	counterGlow.Transparency = 0.2
 	kit:Box(V(-74, 1, 40), V(-50, 14, 42), { Material = Enum.Material.Slate, Color = C(30, 32, 36) })
 	kit:Box(V(-75, 14, 20), V(-49, 15, 42), { Material = Enum.Material.Metal, Color = C(40, 42, 46) })
-	-- toldo listrado na frente
+
 	for i = 0, 5 do
 		kit:Detail(V(26 / 6, 0.2, 4), CF(-75 + 26 / 12 + i * 26 / 6, 14.3, 19) * CFrame.Angles(rad(-18), 0, 0), {
 			Material = Enum.Material.Fabric,
@@ -626,7 +597,7 @@ local function kiosk(kit): BasePart
 	for _, x in { -74.5, -49.5 } do
 		kit:Box(V(x - 0.5, 1, 20), V(x + 0.5, 14, 21), { Material = Enum.Material.Metal, Color = C(40, 42, 46) })
 	end
-	-- rack de armas na parede do fundo
+
 	for i, x in { -68, -64, -60, -56 } do
 		local built = SniperBuilder.Build("Lite")
 		WrapPainter.Apply(built.Model, ({ "wrap_areia", "wrap_carbono", "wrap_hex", "wrap_pulso" })[i], { Textures = true })
@@ -654,7 +625,6 @@ local function board(kit): BasePart
 	return panel
 end
 
--- drop zone do spawn
 local function dropZone(kit)
 	kit:Detail(V(34, 0.1, 22), CF(0, 0.06, -46), { Material = Enum.Material.Slate, Color = C(50, 53, 60), Folder = "Plaza" })
 	for _, x in { -17, 17 } do

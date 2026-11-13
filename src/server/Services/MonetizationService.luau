@@ -1,17 +1,3 @@
---[[
-	MonetizationService — Developer Products e o ÚNICO ProcessReceipt do jogo.
-
-	Padrão (doc do ProfileStore "Developer Products" + doc oficial do MarketplaceService):
-	  1. jogador ausente / perfil não carregado → NotProcessedYet (o Roblox tenta de novo depois)
-	  2. PurchaseId já no cache do perfil → só espera o save
-	  3. concede + grava o PurchaseId em Profile.Data
-	  4. espera Profile.LastSavedData conter o PurchaseId → PurchaseGranted
-	Nunca concede no PromptProductPurchaseFinished.
-
-	IDs = 0 no Config: no Studio a compra é simulada (Config.Studio.SimulateRobuxPurchases),
-	fora do Studio o botão avisa que o produto ainda não foi configurado.
-]]
-
 local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -25,9 +11,8 @@ local Registry = require(script.Parent.Parent.Registry)
 
 local MonetizationService = {}
 
-type Grant = (player: Player, data: any) -> string -- retorna mensagem para o toast
+type Grant = (player: Player, data: any) -> string
 
--- ProductId → função de concessão
 local function grantFor(productId: number): Grant?
 	if productId == 0 then
 		return nil
@@ -119,7 +104,6 @@ local function processReceipt(receipt: { [string]: any }): Enum.ProductPurchaseD
 	return waitForSave(profile, purchaseId)
 end
 
--- Studio + ID 0: simula o recibo pelo MESMO caminho de concessão (testa o fluxo inteiro).
 local function simulate(player: Player, grant: Grant): { Ok: boolean, Message: string? }
 	local profile = Registry.DataService.Get(player)
 	if not profile then

@@ -1,13 +1,3 @@
---[[
-	InputController — teclado/mouse, controle e toque num só lugar.
-	Os outros controllers escutam AÇÕES ("Fire", "Aim"…), nunca teclas.
-
-	PC:      LMB atirar · RMB scope · R recarregar · 2/Q faca ↔ sniper · V faca rápida
-	         Shift correr · C/Ctrl slide · F inspecionar · Tab placar · B loja · M menu
-	Controle: RT atirar · LT scope · X recarregar · Y trocar · RB faca rápida · L3 correr · B slide
-	Toque:   botões na tela (sem aim-assist).
-]]
-
 local ContextActionService = game:GetService("ContextActionService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -17,7 +7,6 @@ local ClientState = require(script.Parent.Parent.ClientState)
 
 local InputController = {}
 
--- Pressed(action), Released(action)
 InputController.Pressed = Signal.new()
 InputController.Released = Signal.new()
 
@@ -39,7 +28,6 @@ local BINDINGS = {
 	Play = { Enum.KeyCode.P },
 }
 
--- Ações que não disparam com UI aberta (para não atirar clicando na loja)
 local COMBAT = { Fire = true, Aim = true, Reload = true, Swap = true, QuickMelee = true, Slide = true, Inspect = true, Primary = true }
 
 local TOUCH_LAYOUT = {
@@ -68,7 +56,7 @@ local function handle(action: string, state: Enum.UserInputState)
 			InputController.Released:Fire(action)
 		end
 	end
-	-- Tab/B/M não devem engolir o input de outras UIs
+
 	return if COMBAT[action] then Enum.ContextActionResult.Sink else Enum.ContextActionResult.Pass
 end
 
@@ -84,7 +72,6 @@ function InputController.Init()
 		end
 	end
 
-	-- UI abriu: solta tudo que estava pressionado
 	ClientState.UiOpenChanged:Connect(function(open)
 		if open then
 			for action, isHeld in held do

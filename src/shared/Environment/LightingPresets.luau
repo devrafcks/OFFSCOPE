@@ -1,12 +1,3 @@
---[[
-	LightingPresets — identidade visual de cada mapa (aplicada no CLIENTE).
-	Como Lighting é global, aplicar localmente permite lobby e partidas in-place com céus diferentes.
-
-	Receita "ultrarrealista" (ver pesquisa §6): LightingStyle.Realistic, EnvironmentDiffuse/Specular = 1,
-	Ambient com matiz, Atmosphere para profundidade, Clouds (filho de Terrain), pós leve.
-	DoF nunca no gameplay — só na killcam.
-]]
-
 local Lighting = game:GetService("Lighting")
 local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
@@ -49,7 +40,6 @@ LightingPresets.List = {
 		Reverb = Enum.ReverbType.Hangar,
 	},
 
-	-- porto ao amanhecer: névoa úmida, sol rasante e rosado, contraste suave
 	Cais09 = {
 		Lighting = {
 			ClockTime = 6.15,
@@ -72,7 +62,6 @@ LightingPresets.List = {
 		Reverb = Enum.ReverbType.Plain,
 	},
 
-	-- centro à noite com chuva recente: azul frio, neon, asfalto espelhado
 	Avenida11 = {
 		Lighting = {
 			ClockTime = 0.4,
@@ -95,7 +84,6 @@ LightingPresets.List = {
 		Reverb = Enum.ReverbType.City,
 	},
 
-	-- serra na golden hour: luz dourada lateral, ar limpo e profundo, nuvens visíveis
 	Posto47 = {
 		Lighting = {
 			ClockTime = 17.6,
@@ -148,7 +136,6 @@ function LightingPresets.Apply(presetId: string, options: ApplyOptions?)
 	local opts = options or {}
 	local performance = opts.Performance == true
 
-	-- caminho oficial atual (Unified Lighting); pcall porque a API pode não existir em builds antigos
 	pcall(function()
 		(Lighting :: any).LightingStyle = Enum.LightingStyle.Realistic
 		;(Lighting :: any).PrioritizeLightingQuality = not performance
@@ -198,7 +185,6 @@ function LightingPresets.Apply(presetId: string, options: ApplyOptions?)
 		end
 	end
 
-	-- DoF existe mas fica desligado: só a killcam liga
 	local dof = ensure(Lighting, "DepthOfFieldEffect", "OffscopeDof") :: DepthOfFieldEffect
 	dof.Enabled = false
 	dof.FarIntensity = 0.35

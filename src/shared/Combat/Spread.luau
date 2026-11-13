@@ -1,20 +1,15 @@
 --!strict
---[[
-	Spread determinístico.
-	Cliente e servidor rodam a MESMA conta com a MESMA semente → o servidor reproduz o tiro
-	sem confiar na direção final que o cliente mandaria.
-]]
 
 local Config = require(script.Parent.Parent.Config)
 
 local Spread = {}
 
 export type MoveState = {
-	Speed: number, -- velocidade horizontal (studs/s)
+	Speed: number,
 	Grounded: boolean,
 	Sliding: boolean,
 	Sprinting: boolean,
-	AdsAlpha: number, -- 0..1
+	AdsAlpha: number,
 }
 
 local function smoothstep(t: number): number
@@ -34,7 +29,6 @@ function Spread.MovementMultiplier(state: MoveState): number
 	return 1
 end
 
--- Raio do cone em graus para o estado atual.
 function Spread.Compute(state: MoveState): number
 	local s = Config.Sniper.Spread
 	local mult = Spread.MovementMultiplier(state)
@@ -43,13 +37,12 @@ function Spread.Compute(state: MoveState): number
 	if ads <= s.QuickscopeStart then
 		return hip
 	end
-	-- no scope o movimento ainda pesa, mas bem menos (raiz do multiplicador)
+
 	local scoped = s.AdsSpread * math.sqrt(mult)
 	local t = smoothstep((ads - s.QuickscopeStart) / (1 - s.QuickscopeStart))
 	return hip + (scoped - hip) * t
 end
 
--- Desvia `look` (unitário) por um ponto uniforme num disco de raio `spreadDegrees`.
 function Spread.Apply(look: Vector3, spreadDegrees: number, seed: number): Vector3
 	if spreadDegrees <= 0 then
 		return look.Unit
@@ -61,7 +54,6 @@ function Spread.Apply(look: Vector3, spreadDegrees: number, seed: number): Vecto
 	return (basis * CFrame.Angles(0, 0, theta) * CFrame.Angles(radius, 0, 0)).LookVector
 end
 
--- Raio do cone em pixels na tela (para o anel do retículo).
 function Spread.ToPixels(spreadDegrees: number, fovDegrees: number, viewportHeight: number): number
 	local half = math.tan(math.rad(fovDegrees) / 2)
 	return math.tan(math.rad(spreadDegrees)) / half * (viewportHeight / 2)

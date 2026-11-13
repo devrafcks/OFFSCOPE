@@ -1,9 +1,3 @@
---[[
-	CharmBuilder — charms pendurados no swivel da arma.
-	A Pivot (argola) é ligada por Motor6D ao attachment "Charm"; a viewmodel anima o balanço
-	com uma mola (CFrame no Transform do motor).
-]]
-
 local ModelKit = require(script.Parent.ModelKit)
 
 local CharmBuilder = {}
@@ -76,7 +70,6 @@ local function body(model: Model, visual: { [string]: any })
 	end
 end
 
--- Retorna nil para "charm_none".
 function CharmBuilder.Attach(weaponRoot: BasePart, mount: Attachment, visual: { [string]: any }?): Charm?
 	if not visual or visual.Kind == "None" or visual.Kind == nil then
 		return nil
@@ -101,7 +94,6 @@ function CharmBuilder.Attach(weaponRoot: BasePart, mount: Attachment, visual: { 
 	})
 	body(model, visual)
 
-	-- move tudo para o mount
 	local target = weaponRoot.CFrame * mount.CFrame
 	for _, part in model:GetDescendants() do
 		if part:IsA("BasePart") then

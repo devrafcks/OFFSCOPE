@@ -1,13 +1,3 @@
---[[
-	DummyBuilder — veste um rig R15 como boneco de treino do estande:
-	capacete laranja com viseira, colete com alvo no peito, cinto, joelheiras, botas
-	e um suporte (poste + base) preso ao HumanoidRootPart.
-
-	Tudo é decoração: Massless, sem colisão, sem query e sem toque — as hitboxes continuam
-	sendo as partes do rig (Hitbox.TrackedParts), e o raycast do mundo já ignora o modelo
-	inteiro de quem é rastreado pela LagCompensation.
-]]
-
 local DummyBuilder = {}
 
 local V = Vector3.new
@@ -60,7 +50,6 @@ local function attach(model: Model, host: BasePart, spec: Spec): BasePart
 	return part
 end
 
--- disco com a face voltada para −Z local do host (frente do R15)
 local function disc(model: Model, host: BasePart, name: string, diameter: number, thickness: number, offset: Vector3, color: Color3)
 	attach(model, host, {
 		Name = name,
@@ -77,13 +66,13 @@ local function part(model: Model, name: string): BasePart?
 end
 
 function DummyBuilder.Dress(model: Model)
-	-- corpo de manequim fosco, sem rosto
+
 	for _, child in model:GetDescendants() do
 		if child:IsA("BasePart") and child.Name ~= "HumanoidRootPart" then
 			child.Color = if child.Name:find("Hand") or child.Name:find("Foot") then BODY_DARK else BODY
 			child.Material = Enum.Material.SmoothPlastic
 		elseif child:IsA("Decal") and child.Parent and child.Parent.Name == "Head" then
-			child:Destroy() -- rosto: a viseira faz esse papel
+			child:Destroy()
 		end
 	end
 	local bodyColors = model:FindFirstChildOfClass("BodyColors")
@@ -112,7 +101,7 @@ function DummyBuilder.Dress(model: Model)
 		for i, x in { -0.5, 0, 0.5 } do
 			attach(model, torso, { Name = "Pouch" .. i, Size = V(0.4, 0.34, 0.16), Offset = CF(x, -s.Y / 2 + 0.3, front - 0.2), Color = GEAR_LIGHT })
 		end
-		-- alvo no peito (mira de referência no estande)
+
 		local z = front - 0.17
 		disc(model, torso, "TargetOuter", 0.9, 0.04, V(0, 0.18, z), WHITE)
 		disc(model, torso, "TargetRing", 0.66, 0.04, V(0, 0.18, z - 0.012), RED)
@@ -140,7 +129,6 @@ function DummyBuilder.Dress(model: Model)
 		end
 	end
 
-	-- suporte: poste atrás do quadril até uma base no chão (fica de pé quando o boneco cai)
 	local root = part(model, "HumanoidRootPart")
 	local humanoid = model:FindFirstChildOfClass("Humanoid")
 	if root and humanoid and lower then

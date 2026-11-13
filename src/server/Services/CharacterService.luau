@@ -1,14 +1,3 @@
---[[
-	CharacterService — nascer, morrer e "vestir" a arma em 3ª pessoa.
-
-	• Contexto por jogador: Lobby ou Match. Quem decide o respawn é o dono do contexto.
-	• Avatares normalizados (escala 1, partes de corpo padrão) → hitbox igual para todos.
-	  Roupas, cores e acessórios continuam; acessórios nunca contam como hit.
-	• Arma do mundo (Lite) presa na mão, com o wrap equipado; faca troca de lugar com a sniper.
-	• Pose de segurar a arma: atributos BaseC0/HoldC0 nas juntas + HoldPose por frame
-	  (cliente e servidor; Motor6D ou AnimationConstraint do avatar novo).
-]]
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -39,7 +28,6 @@ local spawnTokens: { [Player]: number } = {}
 local WORLD_SCALE = 0.72
 local KNIFE_SCALE = 0.8
 
--- ── contexto ─────────────────────────────────────────────────────────────────
 function CharacterService.SetContext(player: Player, context: Context)
 	contexts[player] = context
 	player:SetAttribute("Context", context.Kind)
@@ -49,7 +37,6 @@ function CharacterService.GetContext(player: Player): Context
 	return contexts[player] or { Kind = "Lobby" }
 end
 
--- ── descrição normalizada ────────────────────────────────────────────────────
 local function getDescription(player: Player): HumanoidDescription
 	local cached = descriptions[player]
 	if cached then
@@ -82,8 +69,6 @@ local function getDescription(player: Player): HumanoidDescription
 	return description:Clone()
 end
 
--- ── arma em 3ª pessoa ───────────────────────────────────────────────────────
--- Converte o espaço da arma (frente −Z, cima +Y) para o espaço da mão com o braço estendido.
 local HAND_TO_WEAPON = CFrame.fromMatrix(Vector3.new(0, -0.15, -0.05), Vector3.xAxis, Vector3.new(0, 0, -1), Vector3.yAxis)
 local BACK_OFFSET = CFrame.new(0, 0.1, 0.62) * CFrame.Angles(0, 0, math.rad(40)) * CFrame.Angles(0, math.rad(90), 0)
 
@@ -183,7 +168,7 @@ local function applyHoldPose(character: Model)
 	local leftUpper = character:FindFirstChild("LeftUpperArm")
 	local right = Joint.Find(rightUpper, "RightShoulder")
 	local left = Joint.Find(leftUpper, "LeftShoulder")
-	-- BaseC0 guarda o original: respawn/reaplicação nunca acumula rotação
+
 	local function pose(joint: Instance?, offset: CFrame)
 		if not joint then
 			return
@@ -195,9 +180,9 @@ local function applyHoldPose(character: Model)
 		joint:SetAttribute("BaseC0", base)
 		local hold = base * offset
 		if joint:IsA("Motor6D") then
-			Joint.SetC0(joint, hold) -- replica; AnimationConstraint é posado por frame no cliente
+			Joint.SetC0(joint, hold)
 		end
-		-- o cliente aplica o tilt de pitch em cima deste C0 (HoldC0 replica como atributo)
+
 		joint:SetAttribute("HoldC0", hold)
 	end
 	pose(right, CFrame.Angles(0, math.rad(10), 0) * CFrame.Angles(math.rad(88), 0, 0))
@@ -205,7 +190,6 @@ local function applyHoldPose(character: Model)
 	pose(Joint.Find(character:FindFirstChild("Head"), "Neck"), CFrame.identity)
 end
 
--- ── spawn ────────────────────────────────────────────────────────────────────
 export type SpawnOptions = {
 	Frozen: boolean?,
 	Protection: number?,
@@ -236,7 +220,7 @@ function CharacterService.Spawn(player: Player, cframe: CFrame, options: SpawnOp
 		end)
 	end
 	if spawnTokens[player] ~= token then
-		return nil -- outro spawn foi pedido enquanto este carregava
+		return nil
 	end
 
 	local character = player.Character
@@ -317,7 +301,6 @@ function CharacterService.IsAlive(player: Player): boolean
 	return humanoid ~= nil and humanoid.Health > 0
 end
 
--- Teleporta um personagem vivo (sem recarregar).
 function CharacterService.Teleport(player: Player, cframe: CFrame)
 	local character = player.Character
 	if not character then
@@ -336,8 +319,7 @@ function CharacterService.Init()
 		descriptions[player] = nil
 		spawnTokens[player] = nil
 	end)
-	-- mesma pose dos clientes nas AnimationConstraints, para as hitboxes dos braços baterem
-	-- (Motor6D fica com o C0 replicado: nada de escrever C0 60×/s pela rede)
+
 	RunService.PreSimulation:Connect(function(dt)
 		HoldPose.Step(dt, function()
 			return false

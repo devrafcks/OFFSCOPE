@@ -1,14 +1,3 @@
---[[
-	WrapPainter — aplica um wrap aos grupos de peça de uma arma procedural.
-
-	Cada BasePart da arma tem o atributo "Group" (Body, Barrel, Stock, Scope, Mag, Accent, Lens).
-	Um wrap define { Color3, MaterialName } por grupo, mais extras opcionais:
-	  • Texture  — Texture tileável nas 6 faces (só se o id já foi enviado; ver AssetIds)
-	  • Underlay — peça sólida por baixo de ForceField (o material é translúcido)
-	  • Animated — Pulse (2 cores) ou Cycle (gradiente) no grupo Accent e nos ForceField
-	Retorna uma função de limpeza (para a animação). Só visual.
-]]
-
 local RunService = game:GetService("RunService")
 
 local Config = require(script.Parent.Parent.Config)

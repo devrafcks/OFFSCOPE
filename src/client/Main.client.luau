@@ -1,9 +1,3 @@
---[[
-	OFFSCOPE — bootstrap do cliente.
-	Init (ligações, nada que espere) → Start (loops e render steps). Ordem importa:
-	estado → input → câmera/movimento → arma/efeitos/HUD → telas.
-]]
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Shared = ReplicatedStorage:WaitForChild("Shared")

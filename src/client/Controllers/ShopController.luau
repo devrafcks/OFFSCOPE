@@ -1,10 +1,3 @@
---[[
-	ShopController — o "Arsenal".
-	Abas: Loja do dia (rotativa, igual em todos os servidores) · Catálogo (permanente) ·
-	Inventário (equipar) · Passe (30 tiers, faixa grátis + Prime). Preview 3D real das armas
-	via ViewportFrame com o mesmo builder do jogo. Preço em moedas E em Robux, sem caixa.
-]]
-
 local Players = game:GetService("Players")
 local ProximityPromptService = game:GetService("ProximityPromptService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -43,7 +36,6 @@ local busy = false
 local stopAnimations: { () -> () } = {}
 local inventoryFilter = "Wrap"
 
--- ── preview 3D ─────────────────────────────────────────────────────────────
 local function frameModel(viewport: ViewportFrame, model: Model, distanceScale: number?)
 	local camera = Instance.new("Camera")
 	camera.FieldOfView = 30
@@ -81,7 +73,7 @@ local function preview(parent: Instance, item: Catalog.Item): ViewportFrame
 		CharmBuilder.Attach(root, mount, item.Visual)
 		frameModel(viewport, holder, 1.2)
 	else
-		-- ícone tipográfico para efeitos/retículos/tracers
+
 		viewport:Destroy()
 		local color = item.Visual.Color or Config.Rarities[item.Rarity].Color
 		local glyph = if category == "Reticle" then (if item.Visual.Shape == "Cross" then "+" else "•") elseif category == "Tracer" then "━━━" elseif category == "Finisher" then "◉" else "★"
@@ -92,7 +84,6 @@ local function preview(parent: Instance, item: Catalog.Item): ViewportFrame
 	return viewport
 end
 
--- ── ações ──────────────────────────────────────────────────────────────────
 local function request(action: string, payload: { [string]: any }?)
 	if busy then
 		return
@@ -114,7 +105,6 @@ local function request(action: string, payload: { [string]: any }?)
 	end
 end
 
--- ── cartões ────────────────────────────────────────────────────────────────
 local function card(item: Catalog.Item, order: number, context: string)
 	local rarity = Config.Rarities[item.Rarity]
 	local owned = ClientState.Owns(item.Id)
@@ -180,13 +170,11 @@ local function clearContent()
 	end
 end
 
--- a aba Passe usa lista vertical; as outras, grade
 local function setGrid(enabled: boolean)
 	refs.Grid.Parent = if enabled then content else nil
 	refs.List.Parent = if enabled then nil else content
 end
 
--- ── abas ───────────────────────────────────────────────────────────────────
 local function renderDaily()
 	setGrid(true)
 	local profile = ClientState.Profile
@@ -441,7 +429,7 @@ function ShopController.Init()
 			ShopController.Open()
 		end
 	end)
-	-- contador da loja diária vivo
+
 	RunService.Heartbeat:Connect(function()
 		if isOpen and currentTab == "Daily" and refs.Subtitle then
 			refs.Subtitle.Text = `A loja vira em {Format.Time(DailyShop.SecondsUntilReset() // 60)}`

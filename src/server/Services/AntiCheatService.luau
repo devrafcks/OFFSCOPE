@@ -1,12 +1,3 @@
---[[
-	AntiCheatService — defesa realista, sem falso positivo em flick.
-
-	• Look (unreliable ~12 Hz): guarda pitch/yaw recentes → cone anti silent-aim, giro "360", pose 3ª pessoa.
-	• Velocidade: amostra a HumanoidRootPart com tolerância de ping e de slide.
-	• Estatística: HS% em amostra grande, snaps perfeitos repetidos.
-	Tudo vira SCORE + log. Kick só acima de Config.AntiCheat.KickThreshold (∞ no MVP).
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -31,7 +22,7 @@ type Record = {
 
 local records: { [Player]: Record } = {}
 local lookLimiter = RateLimiter.new(table.unpack(Config.Netcode.RemoteBudgets.Look))
-local LOOK_HISTORY = 2.0 -- s
+local LOOK_HISTORY = 2.0
 
 local function get(player: Player): Record
 	local record = records[player]
@@ -64,7 +55,6 @@ function AntiCheatService.Flag(player: Player, reason: string, weight: number, d
 	end
 end
 
--- Servidor teleportou o jogador: ignora a checagem de velocidade por um instante.
 function AntiCheatService.Grace(player: Player, seconds: number?)
 	local record = get(player)
 	record.GraceUntil = os.clock() + (seconds or 2)
@@ -75,7 +65,6 @@ local function unwrap(delta: number): number
 	return (delta + math.pi) % (2 * math.pi) - math.pi
 end
 
--- Soma do giro horizontal (graus) na janela — usado para a tag "360".
 function AntiCheatService.SpinDegrees(player: Player, window: number): number
 	local looks = get(player).Looks
 	local cutoff = os.clock() - window
@@ -92,7 +81,6 @@ function AntiCheatService.SpinDegrees(player: Player, window: number): number
 	return math.deg(total)
 end
 
--- Vetor de olhar replicado mais recente (ou nil).
 function AntiCheatService.LatestLook(player: Player): Vector3?
 	local looks = get(player).Looks
 	local last = looks[#looks]
@@ -102,7 +90,6 @@ function AntiCheatService.LatestLook(player: Player): Vector3?
 	return CFrame.fromEulerAnglesYXZ(last.Pitch, last.Yaw, 0).LookVector
 end
 
--- Tiro: compara a direção declarada com o olhar replicado. Só log (flicks legítimos existem).
 function AntiCheatService.CheckAim(player: Player, look: Vector3)
 	local replicated = AntiCheatService.LatestLook(player)
 	if not replicated then
@@ -112,7 +99,7 @@ function AntiCheatService.CheckAim(player: Player, look: Vector3)
 	if angle > Config.Netcode.AimConeDegrees then
 		AntiCheatService.Flag(player, "AimCone", 1, string.format("%.0f°", angle))
 	end
-	-- snap: dois samples muito próximos com giro enorme logo antes do tiro
+
 	local looks = get(player).Looks
 	local n = #looks
 	if n >= 2 then
@@ -185,7 +172,7 @@ function AntiCheatService.Init()
 		while record.Looks[1] and record.Looks[1].Time < cutoff do
 			table.remove(record.Looks, 1)
 		end
-		-- pose em 3ª pessoa: atributo replicado e quantizado (economiza banda)
+
 		local character = player.Character
 		if character then
 			local quantized = math.floor(sample.Pitch * 50 + 0.5) / 50

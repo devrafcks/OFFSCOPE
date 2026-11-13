@@ -1,5 +1,4 @@
 --!strict
--- Dano por zona com queda por distância. Cabeça sempre mata (ignora falloff).
 
 local Config = require(script.Parent.Parent.Config)
 

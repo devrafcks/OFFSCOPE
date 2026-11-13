@@ -1,9 +1,3 @@
---[[
-	ProgressionService — moedas, XP, estatísticas, passe e desafios diários.
-	Estilo (no-scope, HS, 360…) rende moedas e aparece no feed — NUNCA dano.
-	Kills em dummy do range não dão moedas (anti-farm), só o toast de estilo para treinar.
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -24,7 +18,6 @@ local function today(): number
 	return os.time() // 86400
 end
 
--- Sorteia os 3 desafios do dia (determinístico por jogador+dia) e tira um "retrato" das stats.
 function ProgressionService.RollDailyChallenges(player: Player, data)
 	local day = today()
 	if data.Daily.Day == day and #data.Daily.Ids > 0 then
@@ -101,7 +94,7 @@ local function onKill(info, victimPlayer: Player?, tags: { string })
 	local context = Registry.CharacterService.GetContext(attacker)
 
 	if not victimPlayer then
-		-- dummy: feedback de estilo sem recompensa
+
 		if #tags > 0 then
 			ProgressionService.Toast(attacker, { Kind = "Style", Tags = tags, Coins = Config.Rewards.RangeKillCoins, Distance = info.Distance })
 		end
@@ -136,7 +129,6 @@ local function onKill(info, victimPlayer: Player?, tags: { string })
 	end)
 end
 
--- Fim de partida: moedas/XP/estatística de vitória.
 function ProgressionService.MatchResult(player: Player, won: boolean, roundsWon: number): (number, number)
 	local coins = (if won then Config.Rewards.MatchWin else Config.Rewards.MatchLoss) + roundsWon * Config.Rewards.RoundWin
 	local xp = Config.Rewards.XpPerMatch + (if won then Config.Rewards.XpWinBonus else 0)
@@ -159,7 +151,7 @@ function ProgressionService.Init()
 end
 
 function ProgressionService.Start()
-	-- vira o dia sem precisar reentrar
+
 	while true do
 		task.wait(60)
 		for _, player in Players:GetPlayers() do

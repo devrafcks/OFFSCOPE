@@ -1,12 +1,3 @@
---[[
-	ViewmodelController — braços + arma em 1ª pessoa (local, filhos da Camera).
-
-	Nada de Tool no personagem (clipa na parede e mostra a cabeça). Tudo é procedural:
-	pose = câmera × mistura(hip, ADS, corrida) × equip × reload × sway × bob × recoil,
-	ferrolho e carregador por Motor6D.Transform, mão direita vai até o ferrolho,
-	charm balança com mola. Wrap/charm/faca equipados reconstroem o modelo.
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -54,14 +45,13 @@ local knife: Rig? = nil
 local slot = "Sniper"
 local hidden = false
 
--- entradas de animação (0..1), escritas pelo WeaponController
 local anim = {
 	Ads = 0,
-	Bolt = 0, -- progresso do ciclo do ferrolho
+	Bolt = 0,
 	Reload = 0,
 	Equip = 1,
-	Swing = 0, -- golpe de faca
-	Quick = 0, -- faca rápida a partir da sniper
+	Swing = 0,
+	Quick = 0,
 	Inspect = 0,
 }
 
@@ -84,14 +74,11 @@ local function attachment(root: BasePart, name: string): Attachment?
 	return root:FindFirstChild(name) :: Attachment?
 end
 
--- Transform que leva o pulso (C0) até um ponto da arma, mantendo a orientação da mão.
 local function reachTransform(motor: Motor6D, target: Vector3): CFrame
 	local c0 = motor.C0
 	return c0:Inverse() * CF(target) * (c0 - c0.Position)
 end
 
--- Luz curta presa na arma: em mapa noturno a viewmodel não vira uma silhueta preta.
--- Alcance pequeno (a viewmodel tem ~2 studs) para quase não iluminar o mundo.
 local function addFillLight(root: BasePart, range: number)
 	local light = Instance.new("PointLight")
 	light.Name = "ViewmodelFill"
@@ -116,7 +103,7 @@ local function buildSniper(): Rig
 	local stop = WrapPainter.Apply(model, ClientState.Equipped("Wrap"), { Textures = true, Animate = true })
 
 	local root = built.Root
-	-- mão direita fecha no punho (inclinado 18°), esquerda apoia por baixo do guarda-mão
+
 	local rightGrip = (attachment(root, "RightGrip") :: Attachment).CFrame * CFrame.Angles(rad(-18), 0, 0) * CFrame.Angles(rad(-90), 0, 0)
 	local leftGrip = (attachment(root, "LeftGrip") :: Attachment).CFrame * CF(0, 0.13, 0)
 	local right = ArmsBuilder.Build(root, "RightArm", rightGrip, Vector3.new(0.5, -0.7, 1.5), 1, 0.12)
@@ -215,9 +202,8 @@ function ViewmodelController.MuzzleCFrame(): CFrame
 	return camera.CFrame * CF(0.35, -0.3, -2)
 end
 
--- ── curvas ─────────────────────────────────────────────────────────────────
 local function bell(t: number, a: number, b: number): number
-	-- 0 → 1 → 0 entre a e b
+
 	if t <= a or t >= b then
 		return 0
 	end
@@ -233,7 +219,6 @@ local function smooth(t: number): number
 	return t * t * (3 - 2 * t)
 end
 
--- golpe de faca: preparação → corte diagonal → retorno
 local function swingPose(t: number): CFrame
 	if t <= 0 then
 		return CFrame.identity
@@ -246,15 +231,13 @@ local function swingPose(t: number): CFrame
 	return (raise * slash):Lerp(CFrame.identity, back)
 end
 
--- ── loop ───────────────────────────────────────────────────────────────────
 local function update(dt: number)
 	if not sniper or not knife then
 		return
 	end
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	-- morto (ou personagem novo ainda sem Humanoid no respawn): só tira os modelos da tela.
-	-- Não mexe em `hidden` — antes isso "travava" a arma escondida depois do respawn.
+
 	if not humanoid or humanoid.Health <= 0 then
 		if sniper.Model.Parent then
 			sniper.Model.Parent = nil
@@ -268,7 +251,6 @@ local function update(dt: number)
 	local camCF = camera.CFrame
 	local state = MovementController.State()
 
-	-- sway pelo movimento do mouse/olhar
 	local mouse = UserInputService:GetMouseDelta()
 	local look = camCF.LookVector
 	local turn = lastLook:Cross(look)
@@ -277,7 +259,6 @@ local function update(dt: number)
 	local s = sway:Step(dt)
 	sway.Target = Vector3.zero
 
-	-- bob de passo
 	local moving = state.Grounded and state.Speed > 1
 	local speedFactor = math.clamp(state.Speed / Config.Movement.WalkSpeed, 0, 1.6)
 	if moving then
@@ -322,7 +303,6 @@ local function update(dt: number)
 
 		rig.Root.CFrame = camCF * base * equipCF * reloadCF * boltCF * inspectCF * quickCF * slideTilt * swayCF * bob * recoil
 
-		-- ferrolho + mão direita no ferrolho
 		if rig.Bolt then
 			rig.Bolt.Transform = scaledTransform(SniperBuilder.BoltTransform(bolt))
 		end
@@ -334,7 +314,6 @@ local function update(dt: number)
 			rig.RightArm.Motor.Transform = IDENTITY:Lerp(reachTransform(rig.RightArm.Motor, target), handToBolt)
 		end
 
-		-- carregador: sai, some, volta; mão esquerda acompanha
 		if rig.Mag and rig.MagWell and rig.LeftArm then
 			local out = bell(reload, 0.12, 0.72)
 			rig.Mag.Transform = CF(0, -0.9 * SCALE * out * 2.2, 0.1 * SCALE * out)
@@ -343,14 +322,12 @@ local function update(dt: number)
 			rig.LeftArm.Motor.Transform = IDENTITY:Lerp(reachTransform(rig.LeftArm.Motor, target), handWeight)
 		end
 
-		-- charm: pêndulo empurrado pelo giro da câmera
 		if rig.Charm then
 			charmSpring:Impulse(Vector3.new(turn.X * 60 + k.X * 0.5, 0, turn.Y * 60 + s.Y * 2))
 			local c = charmSpring:Step(dt)
 			rig.Charm.Motor.Transform = CFrame.Angles(math.clamp(c.X, -1.1, 1.1), 0, math.clamp(c.Z, -1.1, 1.1))
 		end
 
-		-- no scope cheio a luneta vira overlay de tela: esconde o modelo
 		local fullyScoped = anim.Ads > 0.92
 		local shouldShow = not hidden and (slot == "Sniper") and not fullyScoped
 		local parent = if shouldShow then camera else nil

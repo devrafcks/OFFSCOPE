@@ -1,13 +1,3 @@
---[[
-	MatchmakingService — filas por modo.
-
-	• Local (padrão, IDs = 0 ou Studio): fila do próprio servidor → partida in-place.
-	• Cross-server (match place publicado): MemoryStoreQueue por modo. Qualquer lobby pode ser o
-	  "matcher": lê N entradas com allOrNothing, reserva servidor e publica a atribuição num
-	  SortedMap por UserId. Cada lobby teleporta os SEUS jogadores (TeleportAsync só move quem
-	  está no servidor). Saídas de fila viram "cancelamentos" (a fila não remove por valor).
-]]
-
 local MemoryStoreService = game:GetService("MemoryStoreService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -62,7 +52,6 @@ function MatchmakingService.ModeOf(player: Player): string?
 	return playerMode[player]
 end
 
--- ── MemoryStore ─────────────────────────────────────────────────────────────
 local function memoryQueue(modeId: string): MemoryStoreQueue
 	return MemoryStoreService:GetQueue(Config.Matchmaking.QueuePrefix .. modeId, 30)
 end
@@ -115,7 +104,7 @@ local function matchRemote(modeId: string)
 		queue:RemoveAsync(readId)
 	end)
 	if #valid < mode.Players then
-		-- devolve os válidos para a fila
+
 		for _, entry in valid do
 			pcall(function()
 				queue:AddAsync(entry, Config.Matchmaking.QueueEntryTtl, 1)
@@ -164,7 +153,6 @@ local function collectAssignments()
 	end
 end
 
--- ── API ─────────────────────────────────────────────────────────────────────
 function MatchmakingService.Join(player: Player, modeId: string)
 	if not Config.Modes[modeId] or Registry.RoundService.GetMatch(player) then
 		return
@@ -220,7 +208,7 @@ local function localLoop()
 					Remotes.Event("QueueState"):FireClient(player, nil)
 				end
 				task.wait(Config.Matchmaking.LocalStartDelay)
-				-- alguém saiu durante a contagem?
+
 				local stillQueued = {}
 				for _, player in group do
 					if player.Parent == Players and playerMode[player] == modeId then

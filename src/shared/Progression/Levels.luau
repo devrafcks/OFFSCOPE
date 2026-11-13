@@ -1,5 +1,4 @@
 --!strict
--- Curva de XP da conta e do passe.
 
 local Config = require(script.Parent.Parent.Config)
 
@@ -10,7 +9,6 @@ function Levels.XpForLevel(level: number): number
 	return math.floor(l.BaseXp * l.Growth ^ (level - 1) + 0.5)
 end
 
--- Aplica XP ganho; retorna novo nível, XP dentro do nível e quantos níveis subiu.
 function Levels.Add(level: number, xp: number, gained: number): (number, number, number)
 	local maxLevel = Config.Levels.MaxLevel
 	local ups = 0

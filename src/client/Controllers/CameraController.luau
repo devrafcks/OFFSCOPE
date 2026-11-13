@@ -1,13 +1,3 @@
---[[
-	CameraController — câmera FPS própria (Scriptable).
-
-	• yaw/pitch acumulados do mouse (sens do perfil, ajustada pelo FOV no scope), stick e toque
-	• recoil como mola que volta sozinha (o bolt-action não "sobe" a mira para sempre)
-	• FOV: hip (setting) + bônus de corrida/slide, interpolado até o FOV da luneta pelo alpha de ADS
-	• gira o corpo com AlignOrientation (física do cliente, sem brigar com o Humanoid)
-	• manda o olhar ao servidor (~12 Hz, unreliable) para pose em 3ª pessoa e anti-cheat
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -34,8 +24,8 @@ local touchDelta = Vector2.zero
 local touchId: InputObject? = nil
 local lastLookSent = 0
 
-local recoil = Spring.new(120, 18) -- x = pitch, y = yaw (graus)
-local dip = Spring.new(160, 14) -- queda da câmera ao aterrissar / slide
+local recoil = Spring.new(120, 18)
+local dip = Spring.new(160, 14)
 local shake = Spring.new(260, 20)
 
 local align: AlignOrientation? = nil
@@ -53,7 +43,6 @@ function CameraController.SetAngles(newYaw: number, newPitch: number)
 	pitch = newPitch
 end
 
--- Olhar "limpo" (sem recoil) — é a direção que o servidor valida.
 function CameraController.GetLook(): Vector3
 	return CFrame.fromEulerAnglesYXZ(pitch, yaw, 0).LookVector
 end
@@ -78,7 +67,6 @@ function CameraController.Shake(amount: number)
 	shake:Impulse(Vector3.new((math.random() - 0.5) * amount * 30, (math.random() - 0.5) * amount * 30, 0))
 end
 
--- Killcam / cutscene assumem a câmera.
 function CameraController.Suspend(value: boolean)
 	suspended = value
 	if not value then
@@ -145,7 +133,6 @@ local function onRender(dt: number)
 		yaw -= mouse.X * sens
 		pitch -= mouse.Y * sens
 
-		-- touch: arrastar no lado direito da tela
 		if touchDelta.Magnitude > 0 then
 			local touchSens = Config.Camera.TouchSensitivity * (ClientState.Settings.Sensitivity or 1) * (sens / Config.Camera.DefaultSensitivity / (ClientState.Settings.Sensitivity or 1))
 			yaw -= touchDelta.X * touchSens
@@ -153,7 +140,6 @@ local function onRender(dt: number)
 			touchDelta = Vector2.zero
 		end
 
-		-- controle: curva exponencial + deadzone
 		for _, state in UserInputService:GetGamepadState(Enum.UserInputType.Gamepad1) do
 			if state.KeyCode == Enum.KeyCode.Thumbstick2 then
 				local v = Vector2.new(state.Position.X, state.Position.Y)
@@ -170,7 +156,6 @@ local function onRender(dt: number)
 	local limit = math.rad(Config.Camera.PitchLimit)
 	pitch = math.clamp(pitch, -limit, limit)
 
-	-- molas
 	local r = recoil:Step(dt)
 	local d = dip:Step(dt)
 	local s = shake:Step(dt)
@@ -187,7 +172,6 @@ local function onRender(dt: number)
 	targetFov += (Config.Camera.ScopeFov - targetFov) * adsAlpha
 	camera.FieldOfView += (targetFov - camera.FieldOfView) * math.min(1, dt * 18)
 
-	-- corpo segue o yaw
 	humanoid.AutoRotate = false
 	ensureAlign(root)
 	if align then
@@ -208,7 +192,7 @@ local function onCharacter(character: Model)
 	if not root or not humanoid then
 		return
 	end
-	-- herda a orientação do spawn
+
 	local _, y, _ = root.CFrame:ToEulerAnglesYXZ()
 	yaw = y
 	pitch = 0

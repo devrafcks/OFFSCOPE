@@ -1,5 +1,4 @@
 --!strict
--- Classifica uma kill em tags de estilo (kill feed + moedas). Nunca altera dano.
 
 local Config = require(script.Parent.Parent.Config)
 
@@ -16,7 +15,6 @@ export type Input = {
 	Backstab: boolean?,
 }
 
--- Ordem de exibição no kill feed
 ShotStyle.Order = { "Spin", "NoScope", "Quickscope", "Aerial", "Headshot", "LongShot", "Backstab", "Knife" }
 
 ShotStyle.Labels = {
@@ -41,7 +39,6 @@ ShotStyle.Colors = {
 	Knife = Color3.fromRGB(230, 230, 230),
 } :: { [string]: Color3 }
 
--- Estatística do perfil incrementada por cada tag
 ShotStyle.StatFor = {
 	NoScope = "NoScopes",
 	Quickscope = "Quickscopes",

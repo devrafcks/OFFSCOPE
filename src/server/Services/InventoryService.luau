@@ -1,9 +1,3 @@
---[[
-	InventoryService — comprar com moedas, equipar, resgatar passe.
-	Tudo é só visual. Itens à venda por moedas: catálogo permanente + loja diária de hoje.
-	Compras em Robux passam pelo MonetizationService (ProcessReceipt).
-]]
-
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -30,7 +24,6 @@ function InventoryService.Owns(data, itemId: string): boolean
 	return Catalog.IsDefault(itemId) or data.Inventory[itemId] == true
 end
 
--- Concede (idempotente). Retorna true se era novo.
 function InventoryService.Grant(data, itemId: string): boolean
 	if not Catalog.Get(itemId) or data.Inventory[itemId] then
 		return false
@@ -50,7 +43,7 @@ function InventoryService.IsForSaleCoins(itemId: string): boolean
 	if item.Pool == "daily" then
 		return DailyShop.Contains(itemId)
 	end
-	-- itens de passe também podem ser comprados por moedas quando têm preço (ex.: lendária 25.000)
+
 	return item.Pool == "pass" and item.Rarity == "Legendary"
 end
 
@@ -132,7 +125,7 @@ local function claimPass(player: Player, tier: any, track: any): Result
 		c[key] = true
 		if itemId then
 			if not InventoryService.Grant(d, itemId) then
-				-- já tinha o item: converte em moedas
+
 				local coins = (Catalog.Get(itemId) :: any).PriceCoins or 1000
 				d.Coins += math.floor(coins / 2)
 			end

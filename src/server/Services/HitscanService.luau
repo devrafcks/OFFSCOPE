@@ -1,21 +1,3 @@
---[[
-	HitscanService — validação autoritativa do tiro da sniper.
-
-	O cliente manda INTENÇÃO: origem, olhar, semente e spread declarados, horário de servidor e alpha de ADS.
-	O servidor:
-	   1. rate limit + ferrolho + munição + estado (vivo, não congelado, sniper na mão, sem reload)
-	   2. origem perto da cabeça (≤ MaxOriginDistance)
-	   3. spread declarado ≥ mínimo plausível (velocidade/ar/ADS) — senão usa o do servidor
-	   4. reproduz a direção com Spread.Apply(look, spread, seed) — mesma conta do cliente
-	   5. olhar vs. olhar replicado (cone anti silent-aim → só log)
-	   6. rewind das hitboxes para o instante que o atirador VIA
-	   7. raycast no mundo (sem personagens) → distância de linha de visão
-	   8. raio × OBBs rebobinadas (+padding) → personagem mais próximo antes da parede;
-	      dentro dele vale a zona mais nobre atravessada (braço não blinda cabeça/tronco)
-	   9. dano por zona/distância → DamageService
-	  10. HitConfirm para o atirador, ShotFx para os outros
-]]
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -42,7 +24,6 @@ local function finiteNumber(n: any): boolean
 	return type(n) == "number" and n == n and n > -1e12 and n < 1e12
 end
 
--- Parâmetros do raycast de mundo: ignora todos os personagens/dummies e efeitos.
 local function worldParams(): RaycastParams
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
@@ -66,7 +47,6 @@ end
 
 HitscanService.WorldParams = worldParams
 
--- Estado de movimento estimado no servidor (para o mínimo de spread).
 local function serverMoveState(character: Model, adsAlpha: number)
 	local root = character:FindFirstChild("HumanoidRootPart") :: BasePart?
 	local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -76,7 +56,7 @@ local function serverMoveState(character: Model, adsAlpha: number)
 	return {
 		Speed = horizontal,
 		Grounded = grounded,
-		Sliding = false, -- o slide é generoso: tratamos como corrida
+		Sliding = false,
 		Sprinting = horizontal > Config.Movement.WalkSpeed + 2,
 		AdsAlpha = adsAlpha,
 	}
@@ -92,7 +72,6 @@ export type CastResult = {
 	Distance: number,
 }
 
--- Raio contra mundo + hitboxes rebobinadas. `shooter` é ignorado. `filter(model)` decide alvos válidos.
 function HitscanService.Cast(origin: Vector3, direction: Vector3, rewindTime: number, shooter: Model?, filter: (Model) -> boolean): CastResult
 	local range = Config.Sniper.Range
 	local world = Workspace:Raycast(origin, direction * range, worldParams())
@@ -111,7 +90,7 @@ function HitscanService.Cast(origin: Vector3, direction: Vector3, rewindTime: nu
 		if not snapshot then
 			continue
 		end
-		-- descarte barato: o raio passa perto do torso rebobinado?
+
 		local center = snapshot.UpperTorso or snapshot.Torso or snapshot.Head
 		if center then
 			local toCenter = center.Position - origin
@@ -124,9 +103,7 @@ function HitscanService.Cast(origin: Vector3, direction: Vector3, rewindTime: nu
 				continue
 			end
 		end
-		-- Dentro do MESMO personagem vale a zona mais nobre que o raio atravessa:
-		-- braço e mão (que ficam na frente do peito ao segurar a arma) não blindam cabeça/tronco.
-		-- Entre personagens diferentes, vence o mais próximo.
+
 		local modelT = math.huge
 		local modelPart: string? = nil
 		local modelPriority = 0
@@ -173,7 +150,7 @@ function HitscanService.Cast(origin: Vector3, direction: Vector3, rewindTime: nu
 end
 
 local function onFire(player: Player, origin: any, look: any, seed: any, spread: any, clientTime: any, adsAlpha: any, shotId: any)
-	-- 0. tipos
+
 	if not (finiteVector(origin) and finiteVector(look) and finiteNumber(seed) and finiteNumber(spread)) then
 		return
 	end
@@ -185,7 +162,6 @@ local function onFire(player: Player, origin: any, look: any, seed: any, spread:
 		return
 	end
 
-	-- 1. estado
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	local head = character and character:FindFirstChild("Head") :: BasePart?
@@ -213,13 +189,11 @@ local function onFire(player: Player, origin: any, look: any, seed: any, spread:
 	state.LastShot = nowClock
 	state.Mag -= 1
 
-	-- 2. origem
 	if (origin - head.Position).Magnitude > Config.Netcode.MaxOriginDistance then
 		Registry.AntiCheatService.Flag(player, "Origin", 2)
 		origin = head.Position
 	end
 
-	-- 3. spread
 	look = (look :: Vector3).Unit
 	local clampedAds = math.clamp(adsAlpha, 0, CombatState.MaxAdsAlpha(state))
 	local minimum = Spread.Compute(serverMoveState(character, clampedAds)) * Config.Netcode.SpreadTolerance
@@ -229,13 +203,10 @@ local function onFire(player: Player, origin: any, look: any, seed: any, spread:
 		usedSpread = minimum
 	end
 
-	-- 4. direção reproduzida
 	local direction = Spread.Apply(look, usedSpread, math.floor(seed))
 
-	-- 5. silent aim (log)
 	Registry.AntiCheatService.CheckAim(player, look)
 
-	-- 6–8. rewind + cast
 	local rewind = Registry.LagCompensation.RewindTime(player, clientTime)
 	local DamageService = Registry.DamageService
 	local result = HitscanService.Cast(origin, direction, rewind, character, function(model)
@@ -257,7 +228,6 @@ local function onFire(player: Player, origin: any, look: any, seed: any, spread:
 		)
 	end
 
-	-- 9. dano
 	local confirm = { ShotId = shotId, Hit = false }
 	if result.Model and result.Zone then
 		local amount = Damage.Sniper(result.Zone :: any, result.Distance)
@@ -289,7 +259,6 @@ local function onFire(player: Player, origin: any, look: any, seed: any, spread:
 		end
 	end
 
-	-- 10. avisos
 	Remotes.Event("HitConfirm"):FireClient(player, confirm)
 	local fx = Remotes.Event("ShotFx")
 	local tracer = character:GetAttribute("Tracer") or Config.DefaultEquipped.Tracer

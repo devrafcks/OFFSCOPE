@@ -1,9 +1,3 @@
---[[
-	ModelKit — helpers para montar modelos procedurais com Parts nativas do Studio.
-	Todas as armas, braços, charms e facas do OFFSCOPE são construídos por código
-	(sem mesh externo): versionável, revisável e leve.
-]]
-
 local ModelKit = {}
 
 export type PartSpec = {
@@ -48,7 +42,6 @@ function ModelKit.Part(parent: Instance, spec: PartSpec): BasePart
 	return part
 end
 
--- Cilindro com eixo ao longo de Z (o Cylinder do Roblox é em X).
 function ModelKit.CylinderZ(parent: Instance, name: string, length: number, diameter: number, position: Vector3, group: string?): BasePart
 	return ModelKit.Part(parent, {
 		Name = name,
@@ -59,7 +52,6 @@ function ModelKit.CylinderZ(parent: Instance, name: string, length: number, diam
 	})
 end
 
--- Cilindro vertical (eixo Y).
 function ModelKit.CylinderY(parent: Instance, name: string, height: number, diameter: number, position: Vector3, group: string?): BasePart
 	return ModelKit.Part(parent, {
 		Name = name,
@@ -78,7 +70,6 @@ function ModelKit.Attachment(parent: BasePart, name: string, worldCFrame: CFrame
 	return attachment
 end
 
--- Solda todas as BaseParts de `container` em `root` (WeldConstraint), exceto `root`.
 function ModelKit.WeldAll(container: Instance, root: BasePart)
 	for _, part in container:GetDescendants() do
 		if part:IsA("BasePart") and part ~= root and not part:FindFirstChildOfClass("WeldConstraint") then
@@ -90,7 +81,6 @@ function ModelKit.WeldAll(container: Instance, root: BasePart)
 	end
 end
 
--- Motor6D com C0 = posição atual de `part` relativa a `root` (para animar via Transform).
 function ModelKit.Motor(root: BasePart, part: BasePart, name: string): Motor6D
 	local motor = Instance.new("Motor6D")
 	motor.Name = name
@@ -109,7 +99,6 @@ export type FinalizeOptions = {
 	Query: boolean?,
 }
 
--- Propriedades físicas de "prop visual": sem colisão, sem toque, sem massa, sem sombra.
 function ModelKit.Finalize(model: Instance, root: BasePart, options: FinalizeOptions?)
 	local opts = options or {}
 	for _, part in model:GetDescendants() do
@@ -125,7 +114,6 @@ function ModelKit.Finalize(model: Instance, root: BasePart, options: FinalizeOpt
 	root.Anchored = opts.Anchored ~= false
 end
 
--- Sub-montagem presa por solda/motor: tudo solto, sem colisão, sem sombra.
 function ModelKit.MakeVisual(model: Instance)
 	for _, part in model:GetDescendants() do
 		if part:IsA("BasePart") then

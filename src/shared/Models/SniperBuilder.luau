@@ -1,15 +1,3 @@
---[[
-	SniperBuilder — a "Vanta-7", bolt-action, montada com Parts nativas.
-
-	Convenções (espaço local da Root, que fica no punho/gatilho):
-	  frente = −Z · cima = +Y · direita = +X   (1 stud ≈ 0,28 m)
-	Sub-montagens animáveis por Motor6D: Bolt (ferrolho), Mag (carregador), CharmMount.
-	Attachments na Root: Muzzle, Charm, RightGrip, LeftGrip, ScopeEye, BoltKnob, MagWell.
-	Grupos (atributo "Group"): Body, Barrel, Stock, Scope, Mag, Accent, Lens — usados pelo WrapPainter.
-
-	Detail = "Full" (viewmodel, ~60 peças) ou "Lite" (3ª pessoa, ~25 peças).
-]]
-
 local ModelKit = require(script.Parent.ModelKit)
 
 local SniperBuilder = {}
@@ -35,26 +23,23 @@ local function buildFrame(frame: Model, full: boolean)
 		return ModelKit.Part(frame, spec)
 	end
 
-	-- ── receiver / chassi
 	P({ Name = "Receiver", Size = V(0.3, 0.34, 1.55), CFrame = CF(0, 0.2, -0.36), Group = "Body" })
 	P({ Name = "ReceiverTop", Size = V(0.24, 0.08, 1.45), CFrame = CF(0, 0.4, -0.36), Group = "Body" })
 	P({ Name = "Rail", Size = V(0.14, 0.05, 1.4), CFrame = CF(0, 0.465, -0.38), Group = "Accent" })
 	P({ Name = "EjectionPort", Size = V(0.02, 0.14, 0.42), CFrame = CF(0.155, 0.27, -0.02), Color = Color3.fromRGB(14, 14, 16), Material = Enum.Material.Metal })
 
-	-- ── handguard (chassi flutuante)
 	P({ Name = "Handguard", Size = V(0.3, 0.3, 1.25), CFrame = CF(0, 0.18, -1.72), Group = "Body" })
 	P({ Name = "HandguardBottom", Size = V(0.22, 0.08, 1.15), CFrame = CF(0, 0.0, -1.72), Group = "Body" })
 	if full then
 		for i = 0, 3 do
-			-- rasgos de M-LOK
+
 			P({ Name = "Slot", Size = V(0.31, 0.06, 0.14), CFrame = CF(0, 0.2, -1.3 - i * 0.28), Color = Color3.fromRGB(12, 12, 14), Material = Enum.Material.Metal })
 		end
 	end
 
-	-- ── cano
 	ModelKit.CylinderZ(frame, "Barrel", 2.5, 0.13, V(0, 0.26, -2.75), "Barrel")
 	ModelKit.CylinderZ(frame, "BarrelBase", 0.4, 0.18, V(0, 0.26, -2.25), "Barrel")
-	-- freio de boca
+
 	P({ Name = "Muzzle", Size = V(0.22, 0.2, 0.38), CFrame = CF(0, 0.26, -4.12), Group = "Accent" })
 	if full then
 		for i = 0, 2 do
@@ -62,14 +47,12 @@ local function buildFrame(frame: Model, full: boolean)
 		end
 	end
 
-	-- ── coronha
 	P({ Name = "StockBody", Size = V(0.26, 0.4, 1.2), CFrame = CF(0, 0.08, 1.02), Group = "Stock" })
 	P({ Name = "StockLower", Size = V(0.24, 0.18, 0.7), CFrame = CF(0, -0.18, 1.3) * CFrame.Angles(rad(-8), 0, 0), Group = "Stock" })
 	P({ Name = "CheekRest", Size = V(0.22, 0.12, 0.62), CFrame = CF(0, 0.34, 1.0), Group = "Stock" })
 	P({ Name = "ButtPad", Size = V(0.28, 0.62, 0.09), CFrame = CF(0, 0.0, 1.66), Group = "Accent", Material = Enum.Material.Rubber })
 	P({ Name = "StockNeck", Size = V(0.22, 0.22, 0.32), CFrame = CF(0, 0.14, 0.34), Group = "Stock" })
 
-	-- ── empunhadura
 	P({ Name = "Grip", Size = V(0.2, 0.52, 0.24), CFrame = CF(0, -0.2, 0.16) * CFrame.Angles(rad(-18), 0, 0), Group = "Stock" })
 	if full then
 		P({ Name = "TriggerGuard", Size = V(0.05, 0.04, 0.4), CFrame = CF(0, -0.1, -0.16), Group = "Body" })
@@ -77,7 +60,6 @@ local function buildFrame(frame: Model, full: boolean)
 		P({ Name = "Trigger", Size = V(0.035, 0.13, 0.04), CFrame = CF(0, -0.03, -0.12) * CFrame.Angles(rad(12), 0, 0), Group = "Accent" })
 	end
 
-	-- ── luneta
 	ModelKit.CylinderZ(frame, "ScopeTube", 1.5, 0.2, V(0, SCOPE_Y, -0.45), "Scope")
 	ModelKit.CylinderZ(frame, "ScopeBell", 0.36, 0.32, V(0, SCOPE_Y, -1.32), "Scope")
 	ModelKit.CylinderZ(frame, "ScopeTaper", 0.18, 0.26, V(0, SCOPE_Y, -1.08), "Scope")
@@ -94,7 +76,7 @@ local function buildFrame(frame: Model, full: boolean)
 		for _, z in { -0.05, -0.85 } do
 			P({ Name = "ScopeRing", Size = V(0.24, 0.12, 0.1), CFrame = CF(0, 0.53, z), Group = "Accent" })
 		end
-		-- lentes: vidro com reflexo (o glint para os outros é um efeito separado)
+
 		ModelKit.Part(frame, {
 			Name = "LensFront",
 			Shape = Enum.PartType.Cylinder,
@@ -117,12 +99,12 @@ local function buildFrame(frame: Model, full: boolean)
 			Transparency = 0.3,
 			Group = "Lens",
 		})
-		-- bipé dobrado
+
 		for _, x in { -0.07, 0.07 } do
 			P({ Name = "BipodLeg", Size = V(0.05, 0.05, 0.85), CFrame = CF(x, -0.07, -2.0), Group = "Accent" })
 		end
 		P({ Name = "BipodHinge", Size = V(0.2, 0.08, 0.1), CFrame = CF(0, -0.05, -2.38), Group = "Accent" })
-		-- swivel do charm
+
 		P({ Name = "Swivel", Size = V(0.04, 0.1, 0.1), CFrame = CF(0.17, 0.08, -1.25), Group = "Accent" })
 	else
 		P({ Name = "ScopeRings", Size = V(0.22, 0.12, 0.9), CFrame = CF(0, 0.53, -0.45), Group = "Accent" })
@@ -159,7 +141,7 @@ local function buildMag(mag: Model, full: boolean): BasePart
 	})
 	if full then
 		ModelKit.Part(mag, { Name = "MagPlate", Size = V(0.24, 0.05, 0.48), CFrame = CF(0, -0.355, -0.58), Group = "Accent" })
-		-- cartucho visível no topo
+
 		ModelKit.Part(mag, {
 			Name = "Round",
 			Size = V(0.07, 0.07, 0.36),
@@ -223,7 +205,6 @@ function SniperBuilder.Build(detail: Detail?): Sniper
 	}
 end
 
--- Pose do ferrolho em função do progresso do ciclo (0..1): gira, puxa, empurra, abaixa.
 function SniperBuilder.BoltTransform(progress: number): CFrame
 	if progress <= 0 or progress >= 1 then
 		return CFrame.identity
@@ -238,7 +219,7 @@ function SniperBuilder.BoltTransform(progress: number): CFrame
 	else
 		lift, pull = 1 - (progress - 0.8) / 0.2, 0
 	end
-	-- o ferrolho gira em torno do próprio eixo (Z local da peça = X do cilindro girado)
+
 	return CFrame.new(0, 0, 0) * CFrame.Angles(rad(-65) * lift, 0, 0) * CFrame.new(-0.42 * pull, 0, 0)
 end
 
