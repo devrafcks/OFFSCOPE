@@ -17,8 +17,11 @@ Config.Game = {
 
 -- ─────────────────────────────────────────────────────────────── places
 -- 0 = não publicado. Com Match = 0 o jogo roda tudo "in-place" (lobby + partida no mesmo servidor).
+-- Experiência publicada: universe 10776286889. Match = 0 → partidas rodam no próprio servidor
+-- do lobby (modo testado com 2 jogadores). Para fila entre servidores, publique uma place de
+-- partida na mesma experiência e coloque o ID dela aqui.
 Config.Places = {
-	Lobby = 0,
+	Lobby = 133650768159073,
 	Match = 0,
 }
 
