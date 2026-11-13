@@ -103,7 +103,8 @@ function RoundService.StartMatch(modeId: string, players: { Player }, mapId: str
 end
 
 -- Jogador pediu para sair da partida (botão "Voltar ao lobby").
--- sair de uma ranked em andamento = derrota de ELO
+-- desconectar no meio de uma ranked = derrota de ELO na hora
+-- (o fim da partida só conta quem ainda está no servidor; sem isso, sair do jogo "salvaria" o ELO)
 local function penalizeAbandon(match, player: Player)
 	if not match.Mode.Ranked or match.State == "MatchEnd" or match.State == "Vote" then
 		return
@@ -126,7 +127,7 @@ function RoundService.Leave(player: Player)
 		return
 	end
 	playerMatch[player] = nil
-	penalizeAbandon(match, player)
+	-- quem volta ao lobby continua no Roster da partida: o fim da ranked já conta a derrota
 	match:RemovePlayer(player)
 	Remotes.Event("MatchState"):FireClient(player, nil)
 	returnToLobby({ player })
