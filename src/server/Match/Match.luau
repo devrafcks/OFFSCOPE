@@ -186,12 +186,13 @@ function Match:_spawnPoint(player: Player, index: number): CFrame
 			table.insert(list, cf)
 		end
 	end
-	-- pontos usados há pouco (spawn simultâneo no início, dois mortos ao mesmo tempo) ficam de fora
+	-- Pontos usados nos últimos 2 s (spawn simultâneo no início, dois mortos juntos) contam como
+	-- "inimigos": cada spawn novo vai para o ponto mais longe dos já ocupados.
 	local now = os.clock()
 	self._recentSpawns = self._recentSpawns or {}
 	local recent = self._recentSpawns :: { [CFrame]: number }
 	local best, bestScore = list[(index - 1) % #list + 1], -math.huge
-	for i, cf in list do
+	for _, cf in list do
 		local nearest = math.huge
 		for _, other in self.Players do
 			if other ~= player and self:AreEnemies(player, other) and self.Alive[other] then
@@ -201,14 +202,16 @@ function Match:_spawnPoint(player: Player, index: number): CFrame
 				end
 			end
 		end
-		-- sem inimigo vivo (início da partida) todo ponto "empata": espalha pela ordem do jogador
+		for used, at in recent do
+			if now - at < 2 then
+				nearest = math.min(nearest, (used.Position - cf.Position).Magnitude)
+			end
+		end
+		-- ninguém vivo e nada ocupado: qualquer ponto serve (fica o da ordem do jogador)
 		if nearest == math.huge then
-			nearest = 1000 - ((i - index) % #list) * 10
+			continue
 		end
 		local score = nearest + math.random() * 8
-		if recent[cf] and now - recent[cf] < 2 then
-			score -= 5000
-		end
 		if score > bestScore then
 			best, bestScore = cf, score
 		end
