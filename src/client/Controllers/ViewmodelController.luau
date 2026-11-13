@@ -96,7 +96,7 @@ local function addFillLight(root: BasePart, range: number)
 	local light = Instance.new("PointLight")
 	light.Name = "ViewmodelFill"
 	light.Range = range
-	light.Brightness = 1.6
+	light.Brightness = 3.2
 	light.Color = Color3.fromRGB(255, 240, 222)
 	light.Shadows = false
 	light.Parent = root
@@ -125,7 +125,7 @@ local function buildSniper(): Rig
 	local charm = CharmBuilder.Attach(root, built.CharmMount, charmDef and charmDef.Visual)
 
 	model:ScaleTo(SCALE)
-	addFillLight(root, 3.2)
+	addFillLight(root, 5)
 	for _, part in model:GetDescendants() do
 		if part:IsA("BasePart") then
 			part.CastShadow = false
@@ -159,7 +159,7 @@ local function buildKnife(): Rig
 	WrapPainter.PaintKnife(model, knifeId)
 	local right = ArmsBuilder.Build(built.Root, "RightArm", CFrame.Angles(rad(-90), 0, 0) * CF(0, 0, 0.05), Vector3.new(0.35, -0.6, 1.5), 1, 0.09)
 	model:ScaleTo(SCALE * 1.15)
-	addFillLight(built.Root, 2.6)
+	addFillLight(built.Root, 4)
 	for _, part in model:GetDescendants() do
 		if part:IsA("BasePart") then
 			part.CastShadow = false
