@@ -21,6 +21,40 @@ brilha para o inimigo. Partidas curtas, ranked com ELO, cosméticos a preço jus
 
 ---
 
+## Screenshots
+
+<p align="center"><b>🎮 <a href="https://www.roblox.com/games/133650768159073">Jogue no Roblox</a></b> — capturas reais do jogo rodando no Roblox Studio.</p>
+
+### Em primeira pessoa
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/fp-match.png" alt="Partida no Posto 47 em primeira pessoa"><br><sub><b>Partida · Posto 47</b> — placar por rounds, Vanta-7 com wrap dourado</sub></td>
+    <td width="50%"><img src="assets/screenshots/fp-scope.png" alt="Mirando com a luneta"><br><sub><b>Scope</b> — luneta em overlay, retículo com marcações de distância</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/fp-knife.png" alt="Faca em primeira pessoa"><br><sub><b>Faca</b> — troca rápida (Q), backstab mata na hora</sub></td>
+    <td width="50%"><img src="assets/screenshots/fp-lobby.png" alt="Lobby em primeira pessoa"><br><sub><b>Lobby</b> — HUD cartoon, desafios do dia e portais de fila</sub></td>
+  </tr>
+</table>
+
+### Lobby e mapas
+
+<table>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/lobby-aerial.png" alt="Vista aérea do lobby"><br><sub><b>Base OFFSCOPE</b> — hangar a céu aberto na serra</sub></td>
+    <td width="50%"><img src="assets/screenshots/lobby-plaza.png" alt="Praça do lobby"><br><sub><b>Praça</b> — seis portais de fila, um por modo</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="assets/screenshots/cais09.png" alt="Mapa Cais 09"><br><sub><b>Cais 09</b> — porto industrial ao amanhecer</sub></td>
+    <td width="50%"><img src="assets/screenshots/avenida11.png" alt="Mapa Avenida 11"><br><sub><b>Avenida 11</b> — centro urbano à noite</sub></td>
+  </tr>
+</table>
+
+<p align="center"><img src="assets/screenshots/shop.png" alt="Loja Arsenal" width="80%"><br><sub><b>Arsenal</b> — loja do dia, catálogo, inventário e passe. Só cosméticos.</sub></p>
+
+---
+
 ## Por que este jogo existe
 
 Eu sou dev e queria duas coisas ao mesmo tempo: **um jogo que eu mesmo quisesse jogar com os amigos no Roblox**
