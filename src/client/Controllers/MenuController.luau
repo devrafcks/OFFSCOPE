@@ -351,6 +351,20 @@ local function buildSettingsModal()
 	end)
 	toggle(list, 4, "Modo desempenho", "Desliga bloom, sun rays e luzes secundárias", "PerformanceMode")
 	toggle(list, 5, "Mostrar FPS", "Contador no canto da tela", "ShowFps")
+	-- sair no meio da partida (antes só dava na votação; um FFA de 8 min prendia o jogador)
+	local leave = Theme.Button("SAIR DA PARTIDA", "Danger", {
+		AnchorPoint = Vector2.new(0.5, 1),
+		Position = UDim2.new(0.5, 0, 1, -20),
+		Size = UDim2.fromOffset(240, 44),
+		Visible = false,
+		Parent = frame,
+	})
+	leave.Activated:Connect(function()
+		Remotes.Event("Queue"):FireServer("leave")
+		Audio.Play2D("UiClick")
+		MenuController.CloseModal()
+	end)
+	refs.LeaveMatch = leave
 	refs.SettingsModal = frame
 end
 
@@ -401,6 +415,9 @@ local function renderVisibility()
 		if refs[key] then
 			refs[key].Visible = not inMatch and not (compact and (key == "Challenges" or key == "Hints"))
 		end
+	end
+	if refs.LeaveMatch then
+		refs.LeaveMatch.Visible = inMatch
 	end
 	if inMatch then
 		MenuController.CloseModal()
