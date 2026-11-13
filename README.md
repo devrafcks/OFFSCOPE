@@ -153,7 +153,7 @@ moedas e aparecem no kill feed. **Nunca** alteram dano.
 src/
 ├─ shared/                 ReplicatedStorage.Shared
 │  ├─ Config.luau          ← ÚNICO lugar de números, preços e IDs
-│  ├─ Remotes.luau · Types.luau · Audio.luau · AssetIds.luau (gerado)
+│  ├─ Remotes.luau · Audio.luau · AssetIds.luau (gerado)
 │  ├─ Combat/              Spread (determinístico), Damage, Hitbox (ray×OBB), ShotStyle
 │  ├─ Progression/         Elo, Ranks, Levels
 │  ├─ Cosmetics/           Catalog, DailyShop, WrapPainter
